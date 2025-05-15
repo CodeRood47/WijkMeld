@@ -4,7 +4,7 @@
              x:Class="WijkMeld.Maui.MainPage">
 
     <ScrollView>
-        <VerticalStackLayout
+        /*<VerticalStackLayout
             Padding="30,0"
             Spacing="25">
             <Image
