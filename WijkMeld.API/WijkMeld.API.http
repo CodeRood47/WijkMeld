@@ -1,0 +1,6 @@
+@WijkMeld.API_HostAddress = http://localhost:5079
+
+GET {{WijkMeld.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
