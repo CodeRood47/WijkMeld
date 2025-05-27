@@ -12,6 +12,8 @@ namespace WijkMeld.API.Data
         public DbSet<StatusUpdate> StatusUpdates { get; set; }
         public DbSet<Notification> Notifications { get; set; }
 
+        public DbSet<IncidentPhoto> IncidentPhotos { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -37,6 +39,13 @@ namespace WijkMeld.API.Data
                 .HasMany( u => u.Incidents)
                 .WithOne(i => i.User)
                 .HasForeignKey(i =>i.UserId);
+
+            modelBuilder.Entity<IncidentPhoto>()
+                .HasKey(p => p.Id);
+
+            modelBuilder.Entity<IncidentPhoto>()
+                .Property(p => p.Id)
+                .ValueGeneratedOnAdd();
 
         }
 

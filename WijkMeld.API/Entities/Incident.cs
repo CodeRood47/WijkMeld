@@ -7,7 +7,7 @@ namespace WijkMeld.API.Entities
     public class Incident
     {
         [Key]
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
         [Required]
         public string Name { get; set; }
         [Required]
@@ -24,6 +24,9 @@ namespace WijkMeld.API.Entities
         public DateTime Created { get; set; }
 
         public virtual ICollection<StatusUpdate> StatusUpdates { get; set; } = new List<StatusUpdate>();
+
+        public virtual ICollection<IncidentPhoto> Photos { get; set; } = new List<IncidentPhoto>();
+
 
     }
 }

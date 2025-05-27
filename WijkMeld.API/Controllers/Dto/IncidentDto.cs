@@ -32,5 +32,23 @@ namespace WijkMeld.API.Controllers.Dto
         public string Note { get; set; }
         public Priority? NewPriority { get; set; } // Optioneel
     }
+    public class IncidentResponseDto
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public LocationDto Location { get; set; }
+        public Priority Priority { get; set; }
+        public Status Status { get; set; }
+        public DateTime Created { get; set; }
+
+        public Guid? UserId { get; set; }
+        public string? UserName { get; set; }
+
+        public List<Guid> StatusUpdateIds { get; set; } = new();
+        public List<string> PhotoFilePaths { get; set; } = new();
+    }
+
+
 }
 

@@ -22,30 +22,29 @@ namespace WijkMeld.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserResponseDto>>> GetAll() // Verander return type
+        public async Task<ActionResult<IEnumerable<UserResponseDto>>> GetAll()
         {
-            var users = await _repository.GetAllAsync(); // Deze haalt de EF User objecten op (met Includes!)
+            var users = await _repository.GetAllAsync(); 
 
-            // Map de EF User objecten naar UserResponseDto objecten
             var userDtos = users.Select(u => new UserResponseDto
             {
                 Id = u.Id,
                 UserName = u.UserName,
                 Email = u.Email,
                 Role = u.Role,
-                IncidentIds = u.Incidents?.Select(i => i.Id).ToList() ?? new List<Guid>() // Map alleen de incident IDs
+                IncidentIds = u.Incidents?.Select(i => i.Id).ToList() ?? new List<Guid>() 
             }).ToList();
 
-            return Ok(userDtos); // Retourneer de DTO's
+            return Ok(userDtos);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<UserResponseDto>> GetById(Guid id) // Verander return type
+        public async Task<ActionResult<UserResponseDto>> GetById(Guid id) 
         {
-            var user = await _repository.GetByIdAsync(id); // Haalt de EF User op (met Includes!)
+            var user = await _repository.GetByIdAsync(id); 
             if (user == null) return NotFound();
 
-            // Map het EF User object naar een UserResponseDto
+           
             var userDto = new UserResponseDto
             {
                 Id = user.Id,
@@ -55,7 +54,7 @@ namespace WijkMeld.API.Controllers
                 IncidentIds = user.Incidents?.Select(i => i.Id).ToList() ?? new List<Guid>()
             };
 
-            return Ok(userDto); // Retourneer de DTO
+            return Ok(userDto); 
         }
 
         [HttpDelete("{id}")]
@@ -80,7 +79,33 @@ namespace WijkMeld.API.Controllers
             await _repository.AddAsync(user);
             return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
         }
+        [HttpGet("{id}/incidents")]
+        public async Task<ActionResult<IEnumerable<IncidentResponseDto>>> GetIncidentsForUser(Guid id)
+        {
+            var user = await _repository.GetByIdAsync(id);
+            if (user == null) return NotFound();
 
+            var incidents = user.Incidents?.Select(i => new IncidentResponseDto
+            {
+                Id = i.Id,
+                Name = i.Name,
+                Description = i.Description,
+                Location = new LocationDto {
+                    Lat = i.Location.Lat,
+                    Long = i.Location.Long
+                },
+
+                Priority = i.Priority,
+                Status = i.Status,
+                Created = i.Created,
+                UserId = user.Id,
+                UserName = user.UserName,
+                StatusUpdateIds = i.StatusUpdates?.Select(s => s.Id).ToList() ?? new(),
+                PhotoFilePaths = i.Photos?.Select(p => p.FilePath).ToList() ?? new List<string>()
+            }) ?? Enumerable.Empty<IncidentResponseDto>();
+
+            return Ok(incidents);
+        }
 
     }
 

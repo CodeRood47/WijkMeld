@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
 using WijkMeld.API.Data;
+using WijkMeld.API.Repositories.IncidentPhotos;
 using WijkMeld.API.Repositories.Incidents;
 using WijkMeld.API.Repositories.StatusUpdates;
 using WijkMeld.API.Repositories.Users;
@@ -14,6 +15,8 @@ builder.Services.AddDbContext<WijkMeldContext>(options =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IIncidentRepository, IncidentRepository>();
 builder.Services.AddScoped<IStatusUpdateRepository, StatusUpdateRepository>();
+
+builder.Services.AddScoped<IIncidentPhotoRepository, IncidentPhotoRepository>();
 
 builder.Services.AddScoped<IncidentService>();
 
@@ -49,5 +52,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseStaticFiles();
 
 app.Run();

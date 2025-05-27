@@ -40,6 +40,7 @@ namespace WijkMeld.API.Repositories.Incidents
                  .Include(i => i.User)
                  .Include(i => i.Location)
                  .Include(i=> i.StatusUpdates)
+                 .Include(i => i.Photos)
                  .ToListAsync();
         }
             
@@ -50,6 +51,7 @@ namespace WijkMeld.API.Repositories.Incidents
                      .Include(i => i.User)
                      .Include(i => i.Location)
                      .Include(i => i.StatusUpdates)
+                     .Include(i => i.Photos)
                      .FirstOrDefaultAsync(i => i.Id == id);
             }
 
