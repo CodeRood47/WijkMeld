@@ -21,7 +21,7 @@ namespace WijkMeld.API.Controllers.Dto
         [Required]
         public string UserName { get; set; }
         [Required]
-        public string Password { get; set; }
+        public string PasswordHash { get; set; }
         [Required]
         [EmailAddress]
         public string Email { get; set; }

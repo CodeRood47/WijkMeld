@@ -11,9 +11,11 @@ using Microsoft.EntityFrameworkCore;
 using WijkMeld.API.Data;
 using WijkMeld.API.Repositories.IncidentPhotos;
 using WijkMeld.API.Repositories.Users;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WijkMeld.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("Api/[controller]")]
     public class IncidentsController : ControllerBase

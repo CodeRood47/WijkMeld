@@ -1,5 +1,8 @@
 ﻿
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using WijkMeld.API.Data;
 using WijkMeld.API.Repositories.IncidentPhotos;
 using WijkMeld.API.Repositories.Incidents;
@@ -19,9 +22,32 @@ builder.Services.AddScoped<IStatusUpdateRepository, StatusUpdateRepository>();
 builder.Services.AddScoped<IIncidentPhotoRepository, IncidentPhotoRepository>();
 
 builder.Services.AddScoped<IncidentService>();
+builder.Services.AddScoped<JwtService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// add Authentication with JWT
+
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
+
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer("Bearer", options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtSettings["Issuer"],
+            ValidAudience = jwtSettings["Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(key)
+
+        };
+    });
+builder.Services.AddAuthorization();
 
 //Activate Controllers
 builder.Services.AddControllers();
@@ -48,6 +74,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

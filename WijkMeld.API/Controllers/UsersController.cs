@@ -1,8 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Text;
 using WijkMeld.API.Controllers.Dto;
 using WijkMeld.API.Entities;
 using WijkMeld.API.Repositories;
 using WijkMeld.API.Repositories.Users;
+using WijkMeld.API.Services;
+using System.Security.Cryptography;
+
 
 namespace WijkMeld.API.Controllers
 {
@@ -73,11 +77,21 @@ namespace WijkMeld.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(User user)
+        public async Task<IActionResult> Create(CreateUserDto dto)
         {
-            user.Id = Guid.NewGuid(); 
+            var hashedPassword = ComputeHash(dto.PasswordHash);
+
+            var user = new User
+            {
+                Id = Guid.NewGuid(),
+                UserName = dto.UserName,
+                Email = dto.Email,
+                PasswordHash = hashedPassword,
+                Role = dto.Role
+            };
             await _repository.AddAsync(user);
             return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
+
         }
         [HttpGet("{id}/incidents")]
         public async Task<ActionResult<IEnumerable<IncidentResponseDto>>> GetIncidentsForUser(Guid id)
@@ -105,6 +119,13 @@ namespace WijkMeld.API.Controllers
             }) ?? Enumerable.Empty<IncidentResponseDto>();
 
             return Ok(incidents);
+        }
+
+        private string ComputeHash(string password)
+        {
+            using var sha256 = SHA256.Create();
+            var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+            return Convert.ToBase64String(bytes);
         }
 
     }
