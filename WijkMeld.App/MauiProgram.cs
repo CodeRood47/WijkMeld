@@ -24,8 +24,8 @@ namespace WijkMeld.App
             builder.Services.AddSingleton(sp =>
             {
                 var baseAdress = DeviceInfo.Platform == DevicePlatform.Android
-                ? "http://10.0.2.2:7226"
-                : "http://localhost:7226";
+                ? "https://10.0.2.2:7226"
+                : "https://localhost:7226";
 
                 return new HttpClient { BaseAddress = new Uri(baseAdress) };
             });

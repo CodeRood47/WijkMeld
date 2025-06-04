@@ -63,25 +63,25 @@ namespace WijkMeld.App.Services
         {
 
 
-            // --- START SIMULATIE VOOR DEBUG MODUS ---
-#if DEBUG
-            // Simuleer een succesvolle login voor specifieke credentials in debug modus
-            if (request.Email == "test@test.com" && request.Password == "password")
-            {
-                await Task.Delay(1000); // Simuleer netwerkvertraging
-                await SecureStorage.SetAsync("jwt_token", "dummy_jwt_token_for_debug");
-                IsLoggedIn = true;
-                System.Diagnostics.Debug.WriteLine("DEBUG: Gesimuleerde login succesvol.");
-                return true;
-            }
-            else if (request.Email == "fail@example.com")
-            {
-                await Task.Delay(500); // Simuleer netwerkvertraging
-                IsLoggedIn = false;
-                System.Diagnostics.Debug.WriteLine("DEBUG: Gesimuleerde login mislukt voor 'fail@example.com'.");
-                return false;
-            }
-#endif
+//            // --- START SIMULATIE VOOR DEBUG MODUS ---
+//#if DEBUG
+//            // Simuleer een succesvolle login voor specifieke credentials in debug modus
+//            if (request.Email == "test@test.com" && request.Password == "password")
+//            {
+//                await Task.Delay(1000); // Simuleer netwerkvertraging
+//                await SecureStorage.SetAsync("jwt_token", "dummy_jwt_token_for_debug");
+//                IsLoggedIn = true;
+//                System.Diagnostics.Debug.WriteLine("DEBUG: Gesimuleerde login succesvol.");
+//                return true;
+//            }
+//            else if (request.Email == "fail@example.com")
+//            {
+//                await Task.Delay(500); // Simuleer netwerkvertraging
+//                IsLoggedIn = false;
+//                System.Diagnostics.Debug.WriteLine("DEBUG: Gesimuleerde login mislukt voor 'fail@example.com'.");
+//                return false;
+//            }
+//#endif
 
 
             try
