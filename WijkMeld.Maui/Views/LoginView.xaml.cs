@@ -1,9 +1,13 @@
-namespace WijkMeld.Maui.Views;
+using WijkMeld.Maui.ViewModels;
 
-public partial class LoginView : ContentPage
+namespace WijkMeld.Maui.Views
 {
-	public LoginView()
-	{
-		InitializeComponent();
-	}
+    public partial class LoginView : ContentPage
+    {
+        public LoginView(LoginViewModel viewModel)
+        {
+            InitializeComponent();
+            BindingContext = viewModel;
+        }
+    }
 }

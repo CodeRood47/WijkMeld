@@ -1,7 +1,6 @@
-﻿
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace WijkMeld.Maui.ViewModel
+namespace WijkMeld.App.ViewModels
 {
     public partial class BaseViewModel : ObservableObject
     {

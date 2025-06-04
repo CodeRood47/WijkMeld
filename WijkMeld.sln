@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35931.197 d17.13
+VisualStudioVersion = 17.13.35931.197
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WijkMeld.API", "WijkMeld.API\WijkMeld.API.csproj", "{EB22A26F-96AD-4F40-9E10-90D767758F59}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WijkMeld.Maui", "WijkMeld.Maui\WijkMeld.Maui.csproj", "{C533B9B9-4A61-4A07-990A-9CEB0BDEC71D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WijkMeld.MauiOld", "WijkMeld.Maui\WijkMeld.MauiOld.csproj", "{C533B9B9-4A61-4A07-990A-9CEB0BDEC71D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WijkMeld.Infrastructure", "WijkMeld.Infrastructure\WijkMeld.Infrastructure.csproj", "{B8CC176A-F7CF-4559-8323-6ABAC3746608}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WijkMeld.App", "WijkMeld.App\WijkMeld.App.csproj", "{3FA79D33-4A62-443D-8E5E-DF990D2187BB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,6 +30,11 @@ Global
 		{B8CC176A-F7CF-4559-8323-6ABAC3746608}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B8CC176A-F7CF-4559-8323-6ABAC3746608}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B8CC176A-F7CF-4559-8323-6ABAC3746608}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3FA79D33-4A62-443D-8E5E-DF990D2187BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FA79D33-4A62-443D-8E5E-DF990D2187BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FA79D33-4A62-443D-8E5E-DF990D2187BB}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{3FA79D33-4A62-443D-8E5E-DF990D2187BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FA79D33-4A62-443D-8E5E-DF990D2187BB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

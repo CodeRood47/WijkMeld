@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="WijkMeld.App.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:WijkMeld.App.Views"
+    xmlns:root="clr-namespace:WijkMeld.App"
+    Title="WijkMeld.App">
+
+   
+    <ShellContent
+        Title="Login"
+        ContentTemplate="{DataTemplate local:LoginView}"
+        Route="Login" />
+    
+    <ShellContent
+        Title="Home"
+        ContentTemplate="{DataTemplate local:HomeMapView}"
+        Route="home" />
+            
+
+</Shell>

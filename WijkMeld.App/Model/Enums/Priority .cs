@@ -4,10 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WijkMeld.Maui.ViewModel
+namespace WijkMeld.App.Model.Enums
 {
-    public partial class LoginViewModel : BaseViewModel
+    public enum Priority
     {
-
+        LOW,
+        NORMAL,
+        HIGH,
+        CRITICAL
     }
 }

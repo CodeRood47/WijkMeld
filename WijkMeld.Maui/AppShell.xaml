@@ -6,9 +6,6 @@
     xmlns:local="clr-namespace:WijkMeld.Maui.Views"
     Title="WijkMeld.Maui">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:LoginView}"
-        Route="Views/LoginView" />
+    
 
 </Shell>
