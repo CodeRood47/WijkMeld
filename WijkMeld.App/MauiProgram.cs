@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
+using CommunityToolkit.Maui;
+using CommunityToolkit.Maui.Maps;
 using CommunityToolkit.Mvvm.ComponentModel;
 using WijkMeld.App.Services;
 using WijkMeld.App.ViewModels;
@@ -10,9 +12,22 @@ namespace WijkMeld.App
     {
         public static MauiApp CreateMauiApp()
         {
+
+
+
+
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+//#if WINDOWS
+//			// Initialize the .NET MAUI Community Toolkit Maps by adding the below line of code
+//			    .UseMauiCommunityToolkitMaps("key")
+//#else
+//            // For all other platforms
+//                .UseMauiMaps()
+//#endif
+
+
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -30,9 +45,14 @@ namespace WijkMeld.App
                 return new HttpClient { BaseAddress = new Uri(baseAdress) };
             });
 
+            builder.Services.AddTransient<IncidentService>();
             builder.Services.AddSingleton<AuthenticationService>();
+
             builder.Services.AddTransient<LoginViewModel>();
+            builder.Services.AddTransient<HomeMapViewModel>();
+            
             builder.Services.AddTransient<LoginView>();
+            builder.Services.AddTransient<HomeMapView>();
 
 #if DEBUG
             builder.Logging.AddDebug();
