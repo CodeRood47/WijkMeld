@@ -48,7 +48,7 @@ namespace WijkMeld.App.Services
 
             try
             {
-                var response = await _httpClient.GetAsync($"api/Incidents/{userId}");
+                var response = await _httpClient.GetAsync($"api/Users/{userId}/Incidents");
                 response.EnsureSuccessStatusCode();
 
                 return await response.Content.ReadFromJsonAsync<List<Incident>>();

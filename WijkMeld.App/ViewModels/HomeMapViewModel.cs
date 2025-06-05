@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using WijkMeld.App.Model; // Zorgt ervoor dat jouw Incident model wordt gebruikt
 using WijkMeld.App.Services;
-using Microsoft.Maui.Controls; // Nodig voor Shell
+using Microsoft.Maui.Controls; 
 using System.Linq;
 
 
