@@ -7,8 +7,9 @@
              Title="{Binding Title}">
 
     <ContentPage.ToolbarItems>
-        
-        <ToolbarItem Text="Uitloggen" Command="{Binding LogoutCommandAsync}" />
+
+        <ToolbarItem Text="Uitloggen" Command="{Binding LogoutCommand}" />
+        <ToolbarItem Text="Meld Incident" Command="{Binding NavigateToReportIncidentCommand}" />
     </ContentPage.ToolbarItems>
 
     <Grid RowDefinitions="Auto,*,Auto">
@@ -48,9 +49,9 @@
                         <Frame Margin="5" Padding="10" CornerRadius="10" HasShadow="True">
                             <StackLayout>
                                 <!-- Toont de Name van het incident (voorheen Title in mijn generieke model) -->
-                                <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="18" TextColor="DarkBlue" />
+                                <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="18" TextColor="OrangeRed" />
                                 <!-- Toont de Description van het incident -->
-                                <Label Text="{Binding Description}" FontSize="14" TextColor="Black" Margin="0,5,0,0" />
+                                <Label Text="{Binding Description}" FontSize="14" TextColor="Coral" Margin="0,5,0,0" />
                                 <Grid ColumnDefinitions="*,*">
                                     <!-- Toont de datum (date) van het incident -->
                                     <Label Grid.Column="0" Text="{Binding date, StringFormat='Gemeld op: {0:dd-MM-yyyy HH:mm}'}" FontSize="12" TextColor="Gray" />

@@ -2,7 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using WijkMeld.App.Model; // Zorgt ervoor dat jouw Incident model wordt gebruikt
+using WijkMeld.App.Model; 
 using WijkMeld.App.Services;
 using Microsoft.Maui.Controls; 
 using System.Linq;
@@ -64,7 +64,7 @@ namespace WijkMeld.App.ViewModels
                 else
                 {
                     System.Diagnostics.Debug.WriteLine("HomeMapViewModel: Gebruiker is niet ingelogd, kan geen incidenten laden.");
-                    await Shell.Current.GoToAsync("//LoginPage");
+                    await Shell.Current.GoToAsync("//login");
                 }
             }
             catch (Exception ex)
@@ -88,7 +88,6 @@ namespace WijkMeld.App.ViewModels
         public async Task NavigateToIncidentDetailsAsync(Incident incident)
         {
             if (incident == null) return;
-            // Navigeren naar de IncidentDetails pagina met de geselecteerde incident
             await Shell.Current.GoToAsync($"incidentdetails?incidentId={incident.Id}");
         }
 
@@ -96,10 +95,16 @@ namespace WijkMeld.App.ViewModels
         public async Task LogoutCommandAsync()
         {
             await _authenticationService.LogoutAsync();
-            // Navigeer na uitloggen terug naar de loginpagina (of een andere startpagina).
-            await Shell.Current.GoToAsync("//LoginView");
+    
+            await Shell.Current.GoToAsync("//login");
             System.Diagnostics.Debug.WriteLine("HomeMapViewModel: Uitgelogd en navigeert naar LoginView.");
         }
 
+        [RelayCommand]
+        public async Task NavigateToReportIncidentAsync()
+        { 
+            await Shell.Current.GoToAsync("//reportincident"); 
+            System.Diagnostics.Debug.WriteLine("HomeMapViewModel: Navigeert naar ReportIncidentView.");
+        }
     }
 }

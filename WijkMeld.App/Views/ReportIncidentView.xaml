@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:WijkMeld.App.ViewModels"
+             xmlns:models="clr-namespace:WijkMeld.App.Model"
+             x:Class="WijkMeld.App.Views.ReportIncidentView"
+             Title="{Binding Title}">
+    <StackLayout>
+    <Label Text="Meld een incident"
+           FontSize="28"
+           FontAttributes="Bold"
+           HorizontalOptions="Center"
+           Margin="0,20,0,10" />
+
+    <Entry Placeholder="Naam incident (bijv. 'Afval niet opgehaald')"
+           Text="{Binding Name, Mode=TwoWay}"
+           FontSize="18"
+           ClearButtonVisibility="WhileEditing" />
+    <Editor Placeholder="Beschrijving van het incident"
+            Text="{Binding Description, Mode=TwoWay}"
+            FontSize="18"
+            HeightRequest="100"
+            Margin="0,10,0,20" />
+    
+    <StackLayout Orientation="Horizontal" Spacing="10" VerticalOptions="Center">
+        <Label Text="Prioriteit:" FontSize="18" VerticalOptions="Center"/>
+            <Picker ItemsSource="{Binding Priorities}"
+                SelectedItem="{Binding SelectedPriority, Mode=TwoWay}"
+                Title="Kies prioriteit"
+                FontSize="18"/>
+        </StackLayout>
+
+
+        <Entry Placeholder="Latitude"
+                   Text="{Binding Latitude, Mode=TwoWay}"
+                   Keyboard="Numeric"
+                   FontSize="16" />
+        <Entry Placeholder="Longitude"
+                   Text="{Binding Longitude, Mode=TwoWay}"
+                   Keyboard="Numeric"
+                   FontSize="16" />
+
+        <Label Text="{Binding ErrorMessag}"
+               TextColor="Red"
+               FontSize="20"
+               HorizontalOptions="Center"/>
+
+        <Button Text="Meld Incident"
+                Command="{Binding SaveIncidentCommand}"
+                HorizontalOptions="Fill"
+                Margin="0,20,0,0" />
+
+        <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" HorizontalOptions="Center" />
+
+
+
+
+    </StackLayout>
+
+
+
+</ContentPage>

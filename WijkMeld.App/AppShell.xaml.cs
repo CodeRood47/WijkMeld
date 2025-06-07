@@ -7,8 +7,9 @@ namespace WijkMeld.App
         public AppShell()
         {
             InitializeComponent();
-            Routing.RegisterRoute("Login", typeof(LoginView));
+            Routing.RegisterRoute("login", typeof(LoginView));
             Routing.RegisterRoute("home", typeof(HomeMapView));
+            Routing.RegisterRoute("reportincident", typeof(ReportIncidentView));
         }
     }
 }
