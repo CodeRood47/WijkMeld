@@ -16,6 +16,7 @@ namespace WijkMeld.App.ViewModels
     public partial class ReportIncidentViewModel : BaseViewModel
     {
         private readonly IncidentService _incidentService;
+        private readonly GeolocationService _geolocationService;
 
         [ObservableProperty]
         private string name;
@@ -35,14 +36,63 @@ namespace WijkMeld.App.ViewModels
         [ObservableProperty]
         private string errorMessage;
 
+        [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(SaveIncidentCommand))] 
+        private bool isLocationLoading;
+
         public ObservableCollection<Priority> Priorities { get; } = new ObservableCollection<Priority>(Enum.GetValues(typeof(Priority)).Cast<Priority>());
 
-        public ReportIncidentViewModel(IncidentService incidentService)
+        public ReportIncidentViewModel(IncidentService incidentService, GeolocationService geolocationService)
         {
             Title = "Melding doen";
             _incidentService = incidentService;
+            _geolocationService = geolocationService;
             selectedPriority = Priority.NORMAL;
         }
+
+        public override async Task OnAppearingAsync()
+        {
+            await GetCurrentLocationCommand.ExecuteAsync(null);
+        }
+
+        [RelayCommand(CanExecute = nameof(CanGetLocation))]
+        public async Task GetCurrentLocationAsync()
+        {
+            if (IsLocationLoading) return;
+
+            try
+            {
+                IsLocationLoading = true;
+                ErrorMessage = "";
+                var location = await _geolocationService.GetCurrentLocationAsync();
+                if (location != null)
+                {
+                    Latitude = location.Latitude;
+                    Longitude = location.Longitude;
+                    Debug.WriteLine($"Locatie opgehaald: Lat={Latitude}, Lng={Longitude}");
+                }
+                else
+                {
+                    ErrorMessage = "Kon huidige locatie niet ophalen.";
+                    Debug.WriteLine("Fout bij ophalen huidige locatie.");
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = $"Fout bij ophalen locatie: {ex.Message}";
+                Debug.WriteLine($"Fout bij ophalen locatie: {ex.Message}");
+            }
+            finally
+            {
+                IsLocationLoading = false;
+            }
+        }
+
+        private bool CanGetLocation()
+        {
+            return !IsLocationLoading;
+        }
+
 
         partial void OnNameChanged(string value)
         {

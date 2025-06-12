@@ -59,6 +59,7 @@ namespace WijkMeld.App
             // --- Registratie van je services (blijft hetzelfde) ---
             builder.Services.AddTransient<IncidentService>();
             builder.Services.AddSingleton<AuthenticationService>();
+            builder.Services.AddSingleton<GeolocationService>();
 
             builder.Services.AddTransient<LoginViewModel>();
             builder.Services.AddTransient<HomeMapViewModel>();
