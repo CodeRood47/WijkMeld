@@ -6,6 +6,9 @@ using WijkMeld.App.Model;
 using WijkMeld.App.Services;
 using Microsoft.Maui.Controls; 
 using System.Linq;
+using Microsoft.Maui.Controls.Maps;
+using Microsoft.Maui.Maps;
+using Microsoft.Maui.Devices.Sensors;
 
 
 namespace WijkMeld.App.ViewModels
@@ -18,12 +21,25 @@ namespace WijkMeld.App.ViewModels
         [ObservableProperty]
         private ObservableCollection<Incident> incidents;
 
+        [ObservableProperty]
+        private ObservableCollection<Pin> incidentPins;
+
+        [ObservableProperty]
+        private MapSpan currentMapRegion;
+
         public HomeMapViewModel(IncidentService incidentService, AuthenticationService authenticationService)
         {
             _incidentService = incidentService;
             _authenticationService = authenticationService;
             Incidents = new ObservableCollection<Incident>();
+            IncidentPins = new ObservableCollection<Pin>();
             Title = "Mijn Incidenten";
+
+
+            CurrentMapRegion = MapSpan.FromCenterAndRadius(
+                new Microsoft.Maui.Devices.Sensors.Location(52.370216, 4.895168), // Coördinaten van Amsterdam
+                Distance.FromKilometers(10) // Radius van 10 km
+            );
         }
         public override async Task OnAppearingAsync()
         {
@@ -42,6 +58,7 @@ namespace WijkMeld.App.ViewModels
             {
                 IsBusy = true;
                 Incidents.Clear();
+                IncidentPins.Clear();
 
                 if (_authenticationService.IsUserLoggedIn())
                 {
@@ -52,9 +69,26 @@ namespace WijkMeld.App.ViewModels
                         foreach (var incident in userIncidents)
                         {
                             Incidents.Add(incident);
+
+                            if(incident.Location != null)
+                            {
+                                var pin = new Pin()
+                                {
+                                    Label = incident.Name,
+                                    Address = incident.Location.Address,
+                                    Location = new Microsoft.Maui.Devices.Sensors.Location(incident.Location.lat, incident.Location.lng),
+                                    Type = PinType.Generic
+                                };
+                                IncidentPins.Append(pin);
+                            }
                         }
                         System.Diagnostics.Debug.WriteLine($"HomeMapViewModel: {Incidents.Count} incidenten geladen.");
 
+                        if(IncidentPins.Any())
+                        {
+                            currentMapRegion = MapSpan.FromCenterAndRadius(
+                                incidentPins.First().Location, Distance.FromKilometers(10)); // Stelt de kaart in op het eerste incident met een radius van 10 km
+                        }
                     }
                     else
                     {
@@ -92,7 +126,7 @@ namespace WijkMeld.App.ViewModels
         }
 
         [RelayCommand]
-        public async Task LogoutCommandAsync()
+        public async Task LogoutAsync()
         {
             await _authenticationService.LogoutAsync();
     

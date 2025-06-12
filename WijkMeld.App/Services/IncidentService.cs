@@ -20,9 +20,9 @@ namespace WijkMeld.App.Services
 
 
 
-        public IncidentService(HttpClient httpClient, AuthenticationService authenticationService)
+        public IncidentService(IHttpClientFactory httpClientFactory, AuthenticationService authenticationService)
         {
-            _httpClient = httpClient;
+            _httpClient = httpClientFactory.CreateClient("ApiClient");
             _authenticationService = authenticationService;
         }
 

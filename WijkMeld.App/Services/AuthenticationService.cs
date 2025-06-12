@@ -24,9 +24,9 @@ namespace WijkMeld.App.Services
 
         public string? CurrentUserId => _currentUserId;
 
-        public AuthenticationService(HttpClient httpClient)
+        public AuthenticationService(IHttpClientFactory httpClientFactory)
         {
-            _httpClient = httpClient;
+            _httpClient = httpClientFactory.CreateClient("ApiClient"); 
 
             _isLoggedIn = false;
             System.Diagnostics.Debug.WriteLine("AuthenticationService constructor voltooid.");
