@@ -17,6 +17,7 @@ namespace WijkMeld.App.ViewModels
     {
         private readonly IncidentService _incidentService;
         private readonly AuthenticationService _authenticationService;
+        private readonly GeolocationService _geolocationService;
 
         [ObservableProperty]
         private ObservableCollection<Incident> incidents;
@@ -27,25 +28,53 @@ namespace WijkMeld.App.ViewModels
         [ObservableProperty]
         private MapSpan currentMapRegion;
 
-        public HomeMapViewModel(IncidentService incidentService, AuthenticationService authenticationService)
+        public HomeMapViewModel(IncidentService incidentService, AuthenticationService authenticationService, GeolocationService geolocationService)
         {
             _incidentService = incidentService;
             _authenticationService = authenticationService;
+            _geolocationService = geolocationService;
             Incidents = new ObservableCollection<Incident>();
             IncidentPins = new ObservableCollection<Pin>();
             Title = "Mijn Incidenten";
 
 
             CurrentMapRegion = MapSpan.FromCenterAndRadius(
-                new Microsoft.Maui.Devices.Sensors.Location(52.370216, 4.895168), // Coördinaten van Amsterdam
-                Distance.FromKilometers(10) // Radius van 10 km
+                new Microsoft.Maui.Devices.Sensors.Location(52.370216, 4.895168), 
+                Distance.FromKilometers(10) 
             );
+            _geolocationService = geolocationService;
         }
         public override async Task OnAppearingAsync()
         {
+            await GetCurrentLocationAndCenterMapAsync();
             if (LoadIncidentsCommand.CanExecute(null))
             {
                 await LoadIncidentsCommand.ExecuteAsync(null);
+            }
+        }
+
+        [RelayCommand]
+        public async Task GetCurrentLocationAndCenterMapAsync()
+        {
+            try
+            {
+                var currentLocation = await _geolocationService.GetCurrentLocationAsync();
+                if (currentLocation != null)
+                {
+                        CurrentMapRegion = MapSpan.FromCenterAndRadius
+                        (
+                        currentLocation,
+                        Distance.FromKilometers(10) 
+                        );
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("HomeMapViewModel: Geen huidige locatie beschikbaar.");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"HomeMapViewModel: Fout bij ophalen huidige locatie voor kaart: {ex.Message}");
             }
         }
 
@@ -87,7 +116,7 @@ namespace WijkMeld.App.ViewModels
                         if(IncidentPins.Any())
                         {
                             currentMapRegion = MapSpan.FromCenterAndRadius(
-                                incidentPins.First().Location, Distance.FromKilometers(10)); // Stelt de kaart in op het eerste incident met een radius van 10 km
+                                incidentPins.First().Location, Distance.FromKilometers(10)); 
                         }
                     }
                     else

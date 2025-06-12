@@ -69,8 +69,20 @@
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
-            <maps:Map />
         </VerticalStackLayout>
+        <Border Grid.Row="2" Stroke="#ccc" StrokeThickness="1" Padding="5" Margin="10,0,10,10">
+            <maps:Map x:Name="MyMap"
+                      MapType="Street"
+                      IsShowingUser="True" 
+                      IsScrollEnabled="True"
+                      IsZoomEnabled="True"
+                      VerticalOptions="Fill"
+                      HeightRequest="300"
+                      IsTrafficEnabled="False"
+                      ItemsSource="{Binding IncidentPins}"
+                     />
+
+        </Border>
 
         <!-- Optioneel: Een knop om incidenten handmatig te verversen -->
         <Button Grid.Row="2"

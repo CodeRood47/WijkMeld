@@ -23,7 +23,7 @@ public partial class ReportIncidentView : ContentPage
            if(serviceProvider != null)
             {
                 var viewModel = serviceProvider.GetService<ReportIncidentViewModel>();
-                BindingContext = serviceProvider.GetRequiredService<ReportIncidentViewModel>();
+                BindingContext = viewModel;
 
                 if (viewModel is not null)
                 {

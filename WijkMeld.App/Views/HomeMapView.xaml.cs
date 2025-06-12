@@ -2,6 +2,9 @@
 using Microsoft.Maui.Controls;
 using WijkMeld.App.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Maui.Dispatching;
+using System.ComponentModel;
+
 
 namespace WijkMeld.App.Views;
 
@@ -9,37 +12,72 @@ namespace WijkMeld.App.Views;
 
 public partial class HomeMapView : ContentPage
 {
-	public HomeMapView()
+    private HomeMapViewModel _viewModel;
+    public HomeMapView()
 	{
 		InitializeComponent();
     }
     protected override void OnAppearing()
     {
-            base.OnAppearing();
+        base.OnAppearing();
 
-            // Controleer of de BindingContext nog niet is ingesteld en of de app context beschikbaar is.
-            if (BindingContext == null && Application.Current != null && Application.Current.Handler != null)
+        if (BindingContext == null && Application.Current != null && Application.Current.Handler != null)
+        {
+
+            var serviceProvider = Application.Current.Handler.MauiContext?.Services;
+
+            if (serviceProvider != null)
             {
-                // Haal de ServiceProvider op uit de MAUI context van de huidige applicatie.
-                var serviceProvider = Application.Current.Handler.MauiContext?.Services;
 
-                if (serviceProvider != null)
+                var _viewModel = serviceProvider.GetService<HomeMapViewModel>();
+                BindingContext = _viewModel;
+
+                if (_viewModel is not null)
                 {
-                    // Haal een instantie van HomeMapViewModel op via Dependency Injection.
-                    var viewModel = serviceProvider.GetService<HomeMapViewModel>();
-    BindingContext = viewModel;
+                    _viewModel.PropertyChanged += Vm_propertyChanged;
 
-                    // Roep de LoadIncidentsCommand aan zodra de ViewModel is ingesteld en de pagina verschijnt.
-                    // Zorg ervoor dat het command uitvoerbaar is.
-                    if (viewModel?.LoadIncidentsCommand.CanExecute(null) == true)
+
+                    if (_viewModel?.LoadIncidentsCommand.CanExecute(null) == true)
                     {
-                        viewModel.LoadIncidentsCommand.Execute(null);
+                        _viewModel.LoadIncidentsCommand.Execute(null);
                     }
+
+                    
                 }
-                else
-{
-    System.Diagnostics.Debug.WriteLine("Fout: ServiceProvider niet beschikbaar in HomeMapView.OnAppearing.");
-}
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("Fout: ServiceProvider niet beschikbaar in HomeMapView.OnAppearing.");
             }
         }
+    }
+
+    private void Vm_propertyChanged(object? sender, PropertyChangedEventArgs e)
+
+    {
+        if (sender is HomeMapViewModel vm && e.PropertyName == nameof(vm.CurrentMapRegion))
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                if (vm.CurrentMapRegion != null)
+                {
+                    MyMap.MoveToRegion(vm.CurrentMapRegion);
+                }
+            });
+        }
+    }
+
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+
+        // Afmelden to prevent events memory leaks 
+
+        // mischien weg halen? 
+        if (_viewModel != null)
+        {
+            _viewModel.PropertyChanged -= Vm_propertyChanged;
+        }
+    }
+
 }

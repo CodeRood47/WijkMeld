@@ -3,10 +3,19 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:WijkMeld.App.ViewModels"
              xmlns:models="clr-namespace:WijkMeld.App.Model"
+             xmlns:converters="clr-namespace:WijkMeld.App.Converters"
              x:Class="WijkMeld.App.Views.ReportIncidentView"
              Title="{Binding Title}">
-    <StackLayout>
-    <Label Text="Meld een incident"
+
+    <ContentPage.Resources>
+        <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+    </ContentPage.Resources>
+
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="15" Padding="20" VerticalOptions="CenterAndExpand">
+            
+            <Label Text="Meld een incident"
            FontSize="28"
            FontAttributes="Bold"
            HorizontalOptions="Center"
@@ -16,6 +25,7 @@
            Text="{Binding Name, Mode=TwoWay}"
            FontSize="18"
            ClearButtonVisibility="WhileEditing" />
+            
     <Editor Placeholder="Beschrijving van het incident"
             Text="{Binding Description, Mode=TwoWay}"
             FontSize="18"
@@ -31,16 +41,32 @@
         </StackLayout>
 
 
-        <Entry Placeholder="Latitude"
-                   Text="{Binding Latitude, Mode=TwoWay}"
-                   Keyboard="Numeric"
-                   FontSize="16" />
-        <Entry Placeholder="Longitude"
-                   Text="{Binding Longitude, Mode=TwoWay}"
-                   Keyboard="Numeric"
-                   FontSize="16" />
+            <StackLayout Margin="0,10,0,0">
+                <Label Text="Locatie huidig incident" FontAttributes="Bold" FontSize="16" />
+                <Grid ColumnDefinitions="*,*">
+                    <VerticalStackLayout Grid.Column="0">
+                        <Label Text="Latitude:" FontSize="14" />
+                        <Entry Text="{Binding Latitude, Mode=OneWay}" IsReadOnly="True" FontSize="16" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="1">
+                        <Label Text="Longitude:" FontSize="14" />
+                        <Entry Text="{Binding Longitude, Mode=OneWay}" IsReadOnly="True" FontSize="16" />
+                    </VerticalStackLayout>
+                </Grid>
+                <!-- Indicator voor het ophalen van locatie -->
+                <ActivityIndicator IsRunning="{Binding IsLocationLoading}"
+                                   IsVisible="{Binding IsLocationLoading}"
+                                   HorizontalOptions="Center"
+                                   Margin="0,10,0,0" />
+                <!-- Knop om locatie te verversen, alleen zichtbaar als niet bezig met laden -->
+                <Button Text="Locatie Verversen" 
+                        Command="{Binding GetCurrentLocationCommand}" 
+                        IsVisible="{Binding IsLocationLoading, Converter={StaticResource InverseBoolConverter}}"
+                        HorizontalOptions="Center"
+                        Margin="0,0,0,10" />
+            </StackLayout>
 
-        <Label Text="{Binding ErrorMessag}"
+            <Label Text="{Binding ErrorMessag}"
                TextColor="Red"
                FontSize="20"
                HorizontalOptions="Center"/>
@@ -55,7 +81,8 @@
 
 
 
-    </StackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
 
 
 
