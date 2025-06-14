@@ -11,5 +11,7 @@ namespace WijkMeld.App.Model
         public string Token { get; set; }
 
         public string UserId { get; set; }
+
+        public string UserRole { get; set; }
     }
 }

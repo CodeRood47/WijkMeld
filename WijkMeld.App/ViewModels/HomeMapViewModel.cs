@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
+using WijkMeld.App.Model.Enums;
 using System.Threading.Tasks;
 using WijkMeld.App.Model; 
 using WijkMeld.App.Services;
@@ -9,6 +10,7 @@ using System.Linq;
 using Microsoft.Maui.Controls.Maps;
 using Microsoft.Maui.Maps;
 using Microsoft.Maui.Devices.Sensors;
+using System.Diagnostics;
 
 
 namespace WijkMeld.App.ViewModels
@@ -28,6 +30,18 @@ namespace WijkMeld.App.ViewModels
         [ObservableProperty]
         private MapSpan currentMapRegion;
 
+        [ObservableProperty]
+        private bool isUserRole;
+
+        [ObservableProperty]
+        private bool isAdminRole;
+
+        [ObservableProperty]
+        private bool isFieldAgentRole; // Toekomstig
+
+        [ObservableProperty]
+        private bool isGuestRole;
+
         public HomeMapViewModel(IncidentService incidentService, AuthenticationService authenticationService, GeolocationService geolocationService)
         {
             _incidentService = incidentService;
@@ -42,15 +56,27 @@ namespace WijkMeld.App.ViewModels
                 new Microsoft.Maui.Devices.Sensors.Location(52.370216, 4.895168), 
                 Distance.FromKilometers(10) 
             );
-            _geolocationService = geolocationService;
+          
         }
         public override async Task OnAppearingAsync()
         {
+            await SetUserRolePropertiesAsync();
             await GetCurrentLocationAndCenterMapAsync();
             if (LoadIncidentsCommand.CanExecute(null))
             {
                 await LoadIncidentsCommand.ExecuteAsync(null);
             }
+        }
+
+        private async Task SetUserRolePropertiesAsync()
+        {
+            await _authenticationService.InitializeAsync();
+            var userRole = _authenticationService.CurrentUserRole;
+            IsUserRole = (userRole == UserRole.USER);
+            IsAdminRole = (userRole == UserRole.ADMIN);
+            IsFieldAgentRole = (userRole == UserRole.FIELD_AGENT);
+            IsGuestRole = (userRole == UserRole.GUEST);
+
         }
 
         [RelayCommand]
@@ -89,13 +115,35 @@ namespace WijkMeld.App.ViewModels
                 Incidents.Clear();
                 IncidentPins.Clear();
 
-                if (_authenticationService.IsUserLoggedIn())
+                List<Incident>? incidentsToDisplay = null;
+
+
+
+                switch(_authenticationService.CurrentUserRole)
                 {
-                    System.Diagnostics.Debug.WriteLine("HomeMapViewModel: Gebruiker is ingelogd, laden incidenten...");
-                    var userIncidents = await _incidentService.GetUserIncidentsAsync();
-                    if (userIncidents != null && userIncidents.Any())
-                    {
-                        foreach (var incident in userIncidents)
+                    case UserRole.ADMIN:
+                        Debug.WriteLine("HomeMapViewModel: Gebruiker is ADMIN, laden alle incidenten...");
+                        incidentsToDisplay = await _incidentService.GetAllIncidentsAsync();
+                        break;
+                    case UserRole.FIELD_AGENT:
+                        break;
+                    case UserRole.USER:
+                        Debug.WriteLine("HomeMapViewModel: Gebruiker is USER, laden eigen incidenten...");
+                        incidentsToDisplay = await _incidentService.GetUserIncidentsAsync();
+                        break;
+                    case UserRole.GUEST:
+                        incidentsToDisplay = await _incidentService.GetAllIncidentsAsync();
+                        break;
+                    default:
+                        Debug.WriteLine("HomeMapViewModel: Onbekende rol, geen incidenten geladen.");
+                        break;
+                }
+
+                if (incidentsToDisplay != null && incidentsToDisplay.Any())
+                {
+                   
+                   
+                        foreach (var incident in incidentsToDisplay)
                         {
                             Incidents.Add(incident);
 
@@ -108,8 +156,14 @@ namespace WijkMeld.App.ViewModels
                                     Location = new Microsoft.Maui.Devices.Sensors.Location(incident.Location.lat, incident.Location.lng),
                                     Type = PinType.Generic
                                 };
-                                IncidentPins.Append(pin);
-                            }
+                                IncidentPins.Add(pin);
+                            Debug.WriteLine($"HomeMapViewModel: Dit is een pin {pin.Location.Longitude}");
+
+                        }
+                            else
+                             {
+                            Debug.WriteLine($"HomeMapViewModel: Incident {incident.Name} heeft geen geldige locatie.");
+                             }
                         }
                         System.Diagnostics.Debug.WriteLine($"HomeMapViewModel: {Incidents.Count} incidenten geladen.");
 
@@ -118,16 +172,12 @@ namespace WijkMeld.App.ViewModels
                             currentMapRegion = MapSpan.FromCenterAndRadius(
                                 incidentPins.First().Location, Distance.FromKilometers(10)); 
                         }
-                    }
-                    else
-                    {
-                        System.Diagnostics.Debug.WriteLine("HomeMapViewModel: Geen incidenten gevonden voor de gebruiker.");
-                    }
+                   
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine("HomeMapViewModel: Gebruiker is niet ingelogd, kan geen incidenten laden.");
-                    await Shell.Current.GoToAsync("//login");
+                    Debug.WriteLine("HomeMapViewModel: Geen incidenten om weer te geven (incidentsToDisplay is null of leeg).");
+
                 }
             }
             catch (Exception ex)
@@ -136,7 +186,7 @@ namespace WijkMeld.App.ViewModels
             }
             finally
             {
-                IsBusy = false; // Stelt de IsBusy property van BaseViewModel in
+                IsBusy = false; 
             }
 
         }

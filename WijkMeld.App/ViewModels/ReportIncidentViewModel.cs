@@ -124,8 +124,8 @@ namespace WijkMeld.App.ViewModels
                     Name = Name,
                     Description = Description,
                     Priority = (int)SelectedPriority,
-                    Latitude = 0,
-                    Longitude = 0
+                    Latitude = Latitude,
+                    Longitude = Longitude
                 };
 
                 var success = await _incidentService.CreateIncidentAsync(request);
@@ -154,12 +154,20 @@ namespace WijkMeld.App.ViewModels
 
         private bool CanReportIncident()
         {
+            bool isValid = !IsBusy &&
+                          !string.IsNullOrWhiteSpace(Name) &&
+                          !string.IsNullOrWhiteSpace(Description);
+
+            if (!IsLocationLoading && Latitude == 0 && Longitude == 0)
+            {
+                isValid = false; // Als locatie niet laadt en 0,0 is, is het ongeldig
+            }
 
             Debug.WriteLine($"CanReportIncident evaluatie: IsBusy={IsBusy}, Name='{Name}', Description='{Description}'");
             Debug.WriteLine($"Validatie resultaat: Name valid={!string.IsNullOrWhiteSpace(Name)}, Description valid={!string.IsNullOrWhiteSpace(Description)}");
-            return !IsBusy && !string.IsNullOrWhiteSpace(Name) &&
-                   !string.IsNullOrWhiteSpace(Description);
-                
+            return isValid;
+
+
         }
     }
 }

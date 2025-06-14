@@ -11,6 +11,7 @@ namespace WijkMeld.App.Model.Enums
     {
         USER,
         ADMIN,
-        FIELD_AGENT
+        FIELD_AGENT,
+        GUEST
     }
 }

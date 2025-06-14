@@ -10,7 +10,7 @@
     <ContentPage.ToolbarItems>
 
         <ToolbarItem Text="Uitloggen" Command="{Binding LogoutCommand}" />
-        <ToolbarItem Text="Meld Incident" Command="{Binding NavigateToReportIncidentCommand}" />
+        <!--<ToolbarItem Text="Meld Incident" Command="{Binding NavigateToReportIncidentCommand}"/>-->
     </ContentPage.ToolbarItems>
 
     <Grid RowDefinitions="Auto,*,Auto">
@@ -23,7 +23,7 @@
                            Margin="10" />
 
         <VerticalStackLayout Grid.Row="1" Spacing="10" Padding="10">
-            <Label Text="Mijn Incidenten"
+            <Label Text="{Binding Title}"
                    FontSize="24"
                    FontAttributes="Bold"
                    HorizontalOptions="Center"
@@ -31,9 +31,10 @@
 
             <!-- CollectionView om de lijst met incidenten weer te geven -->
             <CollectionView ItemsSource="{Binding Incidents}"
-                            SelectionMode="None">
+                            SelectionMode="None"
+                            HeightRequest="250">
                 <CollectionView.EmptyView>
-                    <StackLayout Padding="20" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand">
+                    <StackLayout Padding="20" VerticalOptions="Center" HorizontalOptions="Center">
                         <Label Text="Geen incidenten gevonden."
                                FontAttributes="Italic"
                                TextColor="Gray"
@@ -70,7 +71,8 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
         </VerticalStackLayout>
-        <Border Grid.Row="2" Stroke="#ccc" StrokeThickness="1" Padding="5" Margin="10,0,10,10">
+        <Border Grid.Row="2" Stroke="#ccc" StrokeThickness="1" Padding="5" Margin="10,0,10,10"
+                IsVisible="{Binding IsUserRole}">
             <maps:Map x:Name="MyMap"
                       MapType="Street"
                       IsShowingUser="True" 
@@ -84,11 +86,35 @@
 
         </Border>
 
+        <Border Grid.Row="2" Stroke="#ccc" StrokeThickness="1" Padding="5" Margin="10,0,10,10"
+                IsVisible="{Binding IsGuestRole}">
+            <maps:Map x:Name="MyMapGuest"
+                      MapType="Street"
+                      IsShowingUser="True" 
+                      IsScrollEnabled="True"
+                      IsZoomEnabled="True"
+                      VerticalOptions="Fill"
+                      HeightRequest="300"
+                      IsTrafficEnabled="False"
+                      ItemsSource="{Binding IncidentPins}"
+                     />
+
+        </Border>
+
         <!-- Optioneel: Een knop om incidenten handmatig te verversen -->
-        <Button Grid.Row="2"
+        <Button Grid.Row="3"
                 Text="Incidenten Verversen"
                 Command="{Binding LoadIncidentsCommand}"
                 HorizontalOptions="Center"
-                Margin="0,10,0,20" />
+                Margin="0,10,0,20"
+                IsVisible="{Binding IsAdminRole}" />
+
+        <!-- "Meld Incident" knop onderaan voor GUESTs -->
+        <Button Grid.Row="3"
+                Text="Meld Incident"
+                Command="{Binding NavigateToReportIncidentCommand}"
+                HorizontalOptions="Center"
+                Margin="0,10,0,20"
+                IsVisible="{Binding IsGuestRole}" />
     </Grid>
 </ContentPage>

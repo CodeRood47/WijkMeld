@@ -4,6 +4,8 @@
     {
         USER,
         ADMIN,
-        FIELD_AGENT
+        FIELD_AGENT,
+        GUEST
+
     }
 }

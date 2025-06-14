@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using WijkMeld.App.Model;
 using Microsoft.Maui.Storage;
+using WijkMeld.App.Model.Enums;
+using System.Diagnostics;
 
 namespace WijkMeld.App.Services
 {
@@ -14,6 +16,7 @@ namespace WijkMeld.App.Services
         private readonly HttpClient _httpClient;
         private bool _isLoggedIn;
         private string? _currentUserId;
+        private UserRole _currentUserRole;
 
         public bool IsLoggedIn
         {
@@ -23,11 +26,12 @@ namespace WijkMeld.App.Services
         }
 
         public string? CurrentUserId => _currentUserId;
+        public UserRole CurrentUserRole => _currentUserRole;
 
         public AuthenticationService(IHttpClientFactory httpClientFactory)
         {
-            _httpClient = httpClientFactory.CreateClient("ApiClient"); 
-
+            _httpClient = httpClientFactory.CreateClient("ApiClient");
+            _currentUserRole = UserRole.GUEST;
             _isLoggedIn = false;
             System.Diagnostics.Debug.WriteLine("AuthenticationService constructor voltooid.");
 
@@ -38,10 +42,25 @@ namespace WijkMeld.App.Services
             System.Diagnostics.Debug.WriteLine("AuthenticationService InitializeAsync gestart.");
             var token = await SecureStorage.GetAsync("jwt_token");
             var userId = await SecureStorage.GetAsync("user_id");
+            var userRole = await SecureStorage.GetAsync("user_role");
 
+
+            Debug.WriteLine($"[DEBUG] Token: {token}");
+            Debug.WriteLine($"[DEBUG] UserId: {userId}");
+            Debug.WriteLine($"[DEBUG] UserRole (raw): {userRole}");
 
             _isLoggedIn = !string.IsNullOrEmpty(token) && !string.IsNullOrEmpty(userId);
             _currentUserId = userId;
+
+            if (!string.IsNullOrEmpty(userRole) && Enum.TryParse(userRole, out UserRole parsedRole))
+            {
+                _currentUserRole = parsedRole;
+            }
+            else
+            {
+                _currentUserRole = UserRole.GUEST; 
+            }
+            
             System.Diagnostics.Debug.WriteLine($"AuthenticationService initialisatie voltooid. IsLoggedIn: {IsLoggedIn}");
         }
 
@@ -103,6 +122,7 @@ namespace WijkMeld.App.Services
                     _currentUserId = null;
                     SecureStorage.Remove("jwt_token");
                     SecureStorage.Remove("user_id");
+                    SecureStorage.Remove("user_role");
                     System.Diagnostics.Debug.WriteLine($"API Login mislukt: {response.StatusCode}");
                     return false;
                 }
@@ -114,12 +134,14 @@ namespace WijkMeld.App.Services
                     _currentUserId = null;
                     SecureStorage.Remove("jwt_token");
                     SecureStorage.Remove("user_id");
+                    SecureStorage.Remove("user_role");
                     System.Diagnostics.Debug.WriteLine("API Login mislukt: Token of UserId is null in respons.");
                     return false;
                 }
 
                 await SecureStorage.SetAsync("jwt_token", result.Token);
                 await SecureStorage.SetAsync("user_id", result.UserId);
+                await SecureStorage.SetAsync("user_role", result.UserRole);
                 _currentUserId = result.UserId;
                 IsLoggedIn = true;
                 System.Diagnostics.Debug.WriteLine("API Login succesvol.");
@@ -131,6 +153,7 @@ namespace WijkMeld.App.Services
                 _currentUserId = null;
                 SecureStorage.Remove("jwt_token");
                 SecureStorage.Remove("user_id");
+                SecureStorage.Remove("user_role");
                 System.Diagnostics.Debug.WriteLine($"API Login exception: {ex.Message}");
                 return false;
             }
@@ -138,7 +161,10 @@ namespace WijkMeld.App.Services
 
         public async Task<string> GetTokenAsync()
         {
-            return await SecureStorage.GetAsync("jwt_token");
+            var token = await SecureStorage.GetAsync("jwt_token");
+            Debug.WriteLine($"AuthenticationService: GetTokenAsync opgeroepen. Token is: {(!string.IsNullOrEmpty(token) ? "Aanwezig" : "NIET Aanwezig")}");
+
+            return token;
         }
 
         public async Task<string?> GetUserIdAsync()
@@ -151,11 +177,17 @@ namespace WijkMeld.App.Services
             return _currentUserId;
         }
 
+        public async Task<string?> GetUserRoleAsync()
+        {
+            return await SecureStorage.GetAsync("user_role");
+        }
+
 
         public async Task LogoutAsync()
         {
             SecureStorage.Remove("jwt_token");
             SecureStorage.Remove("user_id");
+            SecureStorage.Remove("user_role");
             IsLoggedIn = false;
             _currentUserId = null;
         }

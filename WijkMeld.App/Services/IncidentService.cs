@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using WijkMeld.App.Model;
 using WijkMeld.App.Model.Enums;
 using System.Security.Cryptography.X509Certificates;
+using System.Net;
 
 namespace WijkMeld.App.Services
 {
@@ -43,9 +44,7 @@ namespace WijkMeld.App.Services
                 return null;
             }
 
-            if (string.IsNullOrEmpty(userId))
-            {
-            }
+         
 
 
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
@@ -71,6 +70,47 @@ namespace WijkMeld.App.Services
             }
 
         }
+    
+        public async Task<List<Incident>?> GetAllIncidentsAsync()
+        {
+            var token = await _authenticationService.GetTokenAsync();
+            //_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+
+            try
+            {
+                // Pas dit endpoint aan naar het daadwerkelijke API endpoint voor alle incidenten
+                // Bijvoorbeeld: "api/Incidents/all" of gewoon "api/Incidents" (als POST/GET zonder ID)
+                var response = await _httpClient.GetAsync("Api/Incidents"); // Aanname: GET /api/Incidents geeft alle incidenten
+                response.EnsureSuccessStatusCode();
+
+                return await response.Content.ReadFromJsonAsync<List<Incident>>();
+            }
+            catch (HttpRequestException ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"IncidentService: Fout bij ophalen ALLE incidenten: {ex.Message}");
+           
+                if (ex.StatusCode == HttpStatusCode.Unauthorized)
+                {
+                    // Alleen uitloggen als het een ingelogde gebruiker betreft, niet voor gasten
+                    if (_authenticationService.IsUserLoggedIn())
+                    {
+                        await _authenticationService.LogoutAsync();
+                    }
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"IncidentService: Algemene fout bij ophalen ALLE incidenten: {ex.Message}");
+                return null;
+            }
+        }
+
+
+
+
+
 
         public async Task<bool> CreateIncidentAsync(CreateIncidentRequest request)
         {

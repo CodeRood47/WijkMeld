@@ -59,6 +59,7 @@ namespace WijkMeld.API.Controllers
 
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<IncidentResponseDto>>> GetAllIncidents()
         {
             var incidents = await _incidentRepository.GetAllAsync();
@@ -85,7 +86,7 @@ namespace WijkMeld.API.Controllers
         [HttpPost]
         public async Task<ActionResult<Incident>> CreateIncident([FromBody] CreateIncidentDto incidentDto)
         {
-            Guid? userId = Guid.Parse("d623c606-4d31-4ec3-8cfc-080659179e3c"); // voor test
+            Guid? userId = null;
 
             if (User.Identity?.IsAuthenticated == true && Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out Guid parsedUserId))
             {

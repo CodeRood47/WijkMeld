@@ -36,9 +36,10 @@
                        FontSize="16"
                        HorizontalOptions="Center" />
 
-                <!-- Een afbeelding die op alle platforms werkt -->
-                <Image Source="dotnet_bot.png"
-                       HeightRequest="150"
+             
+                <Image Source="wijkmeld_transparant_logo.png"
+                       HeightRequest="300"
+                       WidthRequest="300"
                        HorizontalOptions="Center" />
 
             </VerticalStackLayout>

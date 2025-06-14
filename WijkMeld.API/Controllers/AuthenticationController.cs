@@ -32,7 +32,7 @@ namespace WijkMeld.API.Controllers
             if (user.PasswordHash != hash) return Unauthorized("Invalid password");
 
             var token = _jwtService.GenerateToken(user);
-            return Ok(new { token, userId = user.Id.ToString() });
+            return Ok(new { token, userId = user.Id.ToString(), userRole = user.Role.ToString() });
         }
         private string ComputeHash(string password)
         {
