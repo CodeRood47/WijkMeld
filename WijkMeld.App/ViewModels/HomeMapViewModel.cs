@@ -28,6 +28,9 @@ namespace WijkMeld.App.ViewModels
         private ObservableCollection<Pin> incidentPins;
 
         [ObservableProperty]
+        private bool pinsAreLoaded;
+
+        [ObservableProperty]
         private MapSpan currentMapRegion;
 
         [ObservableProperty]
@@ -90,17 +93,17 @@ namespace WijkMeld.App.ViewModels
                         CurrentMapRegion = MapSpan.FromCenterAndRadius
                         (
                         currentLocation,
-                        Distance.FromKilometers(10) 
+                        Distance.FromKilometers(5) 
                         );
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine("HomeMapViewModel: Geen huidige locatie beschikbaar.");
+                    Debug.WriteLine("HomeMapViewModel: Geen huidige locatie beschikbaar.");
                 }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"HomeMapViewModel: Fout bij ophalen huidige locatie voor kaart: {ex.Message}");
+                Debug.WriteLine($"HomeMapViewModel: Fout bij ophalen huidige locatie voor kaart: {ex.Message}");
             }
         }
 
@@ -157,22 +160,22 @@ namespace WijkMeld.App.ViewModels
                                     Type = PinType.Generic
                                 };
                                 IncidentPins.Add(pin);
-                            Debug.WriteLine($"HomeMapViewModel: Dit is een pin {pin.Location.Longitude}");
+                            Debug.WriteLine($"HomeMapViewModel: Dit is een pin {pin.Label} {pin.Location.Longitude}");
 
-                        }
+                            }
                             else
                              {
                             Debug.WriteLine($"HomeMapViewModel: Incident {incident.Name} heeft geen geldige locatie.");
                              }
                         }
-                        System.Diagnostics.Debug.WriteLine($"HomeMapViewModel: {Incidents.Count} incidenten geladen.");
+                        Debug.WriteLine($"HomeMapViewModel: {Incidents.Count} incidenten geladen.");
 
                         if(IncidentPins.Any())
                         {
                             currentMapRegion = MapSpan.FromCenterAndRadius(
-                                incidentPins.First().Location, Distance.FromKilometers(10)); 
+                                incidentPins.First().Location, Distance.FromKilometers(5)); 
                         }
-                   
+                    PinsAreLoaded = IncidentPins.Any();
                 }
                 else
                 {

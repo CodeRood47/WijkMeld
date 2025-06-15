@@ -1,10 +1,12 @@
 
 using Microsoft.Maui.Controls;
+using Microsoft.Maui.Controls.Maps;
 using WijkMeld.App.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Maui.Dispatching;
 using System.ComponentModel;
 using System.Diagnostics;
+using Microsoft.Maui.Maps;
 
 
 namespace WijkMeld.App.Views;
@@ -29,7 +31,6 @@ public partial class HomeMapView : ContentPage
 
             if (serviceProvider != null)
             {
-
                 _viewModel = serviceProvider.GetService<HomeMapViewModel>();
                 BindingContext = _viewModel;
 
@@ -43,20 +44,22 @@ public partial class HomeMapView : ContentPage
                     {
                         _viewModel.LoadIncidentsCommand.Execute(null);
                     }
-
-                    
                 }
             }
             else
             {
                Debug.WriteLine("Fout: ServiceProvider niet beschikbaar in HomeMapView.OnAppearing.");
             }
+
         }
 
         MainThread.BeginInvokeOnMainThread(() => {
             Debug.WriteLine("HomeMapView: UpdateToolbarItems aangeroepen in MainThread.");
             UpdateToolbarItems();
         });
+
+
+
     }
 
 
@@ -84,26 +87,56 @@ public partial class HomeMapView : ContentPage
             {
                 MainThread.BeginInvokeOnMainThread(() =>
                 {
-                    if (vm.IsUserRole && MyMap != null)
+
+                    Microsoft.Maui.Controls.Maps.Map mapToUse = vm.IsGuestRole ? MyMapGuest : MyMap;
+
+
+                    if (mapToUse != null)
                     {
-                        MyMap.MoveToRegion(vm.CurrentMapRegion);
+                        mapToUse.MoveToRegion(vm.CurrentMapRegion);
+
+                        mapToUse.Pins.Clear();
+
+
+                        foreach (var pin in vm.IncidentPins)
+                        {
+                            mapToUse.Pins.Add(pin);
+                            Debug.WriteLine($"Pin toegevoegd: {pin.Label} op {pin.Location.Latitude}, {pin.Location.Longitude}");
+                         }
+
                     }
-                    //else if (vm.IsAdminRole && MyMapAdmin != null)
+
+
+
+
+
+
+
+
+
+
+
+
+                    //if (vm.IsUserRole && MyMap != null)
                     //{
-                    //    MyMapAdmin.MoveToRegion(vm.CurrentMapRegion);
+                    //    MyMap.MoveToRegion(vm.CurrentMapRegion);
                     //}
-                    else if (vm.IsGuestRole && MyMapGuest != null)
-                    {
-                        MyMapGuest.MoveToRegion(vm.CurrentMapRegion);
-                    }
-                    //else if (vm.IsFieldAgentRole && MyMapFieldAgent != null)
+                    ////else if (vm.IsAdminRole && MyMapAdmin != null)
+                    ////{
+                    ////    MyMapAdmin.MoveToRegion(vm.CurrentMapRegion);
+                    ////}
+                    //else if (vm.IsGuestRole && MyMapGuest != null)
                     //{
-                    //    MyMapFieldAgent.MoveToRegion(vm.CurrentMapRegion);
+                    //    MyMapGuest.MoveToRegion(vm.CurrentMapRegion);
                     //}
-                    else
-                    {
-                        Debug.WriteLine("HomeMapView: Kaart kan niet verplaatst worden: Geen actieve kaartcontrol of regio is null.");
-                    }
+                    ////else if (vm.IsFieldAgentRole && MyMapFieldAgent != null)
+                    ////{
+                    ////    MyMapFieldAgent.MoveToRegion(vm.CurrentMapRegion);
+                    ////}
+                    //else
+                    //{
+                    //    Debug.WriteLine("HomeMapView: Kaart kan niet verplaatst worden: Geen actieve kaartcontrol of regio is null.");
+                    //}
                 });
             }
 

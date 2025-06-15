@@ -81,8 +81,8 @@
                       VerticalOptions="Fill"
                       HeightRequest="300"
                       IsTrafficEnabled="False"
-                      ItemsSource="{Binding IncidentPins}"
                      />
+           
 
         </Border>
 
@@ -96,7 +96,7 @@
                       VerticalOptions="Fill"
                       HeightRequest="300"
                       IsTrafficEnabled="False"
-                      ItemsSource="{Binding IncidentPins}"
+                   
                      />
 
         </Border>
