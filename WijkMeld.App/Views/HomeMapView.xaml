@@ -32,8 +32,10 @@
             <!-- CollectionView om de lijst met incidenten weer te geven -->
             <CollectionView ItemsSource="{Binding Incidents}"
                             SelectionMode="None"
-                            HeightRequest="250">
-                <CollectionView.EmptyView>
+                            HeightRequest="250"
+                            >
+
+            <CollectionView.EmptyView>
                     <StackLayout Padding="20" VerticalOptions="Center" HorizontalOptions="Center">
                         <Label Text="Geen incidenten gevonden."
                                FontAttributes="Italic"

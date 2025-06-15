@@ -183,6 +183,35 @@ namespace WijkMeld.App.Services
         }
 
 
+        public async Task<bool> LoginAsGuestAsync()
+        {
+            try
+            {
+                await SecureStorage.SetAsync("jwt_token", "ANONYMOUS_GUEST_TOKEN"); 
+                await SecureStorage.SetAsync("user_id", Guid.NewGuid().ToString()); 
+                await SecureStorage.SetAsync("user_role", UserRole.GUEST.ToString());
+
+                _currentUserId = await SecureStorage.GetAsync("user_id");
+                _currentUserRole = UserRole.GUEST;
+                IsLoggedIn = true;
+
+                Debug.WriteLine($"AuthenticationService: Anonieme login succesvol. Rol: {CurrentUserRole}, UserId: {CurrentUserId}");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"AuthenticationService: Fout bij anonieme login: {ex.Message}");
+                // Zorg ervoor dat de status correct is bij een fout
+                IsLoggedIn = false;
+                _currentUserId = null;
+                _currentUserRole = UserRole.GUEST;
+                SecureStorage.Remove("jwt_token");
+                SecureStorage.Remove("user_id");
+                SecureStorage.Remove("user_role");
+                return false;
+            }
+        }
+
         public async Task LogoutAsync()
         {
             SecureStorage.Remove("jwt_token");
