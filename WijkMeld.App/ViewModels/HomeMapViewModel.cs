@@ -203,6 +203,7 @@ namespace WijkMeld.App.ViewModels
         [RelayCommand]
         public async Task NavigateToIncidentDetailsAsync(Incident incident)
         {
+            Debug.WriteLine($"HomeMapViewModel: Navigeren naar details van incident {incident?.Id} met naam '{incident?.Name}'.");
             if (incident == null) return;
             await Shell.Current.GoToAsync($"incidentdetails?incidentId={incident.Id}");
         }

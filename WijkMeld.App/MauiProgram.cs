@@ -64,10 +64,13 @@ namespace WijkMeld.App
             builder.Services.AddTransient<LoginViewModel>();
             builder.Services.AddTransient<HomeMapViewModel>();
             builder.Services.AddTransient<ReportIncidentViewModel>();
+            builder.Services.AddTransient<IncidentDetailViewModel>();
 
             builder.Services.AddTransient<LoginView>();
             builder.Services.AddTransient<HomeMapView>();
             builder.Services.AddTransient<ReportIncidentView>();
+            builder.Services.AddTransient<IncidentDetailView>();
+
 
 #if DEBUG
             builder.Logging.AddDebug();

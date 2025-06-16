@@ -1,12 +1,80 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:WijkMeld.App.ViewModels"
+             xmlns:converters="clr-namespace:WijkMeld.App.Converters"
+             x:DataType="viewmodels:IncidentDetailViewModel"
              x:Class="WijkMeld.App.Views.IncidentDetailView"
-             Title="IncidentDetailView">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+              Title="{Binding Title}">
+
+    <ContentPage.Resources>
+        <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+        <converters:HistoryHeightConverter x:Key="HistoryHeightConverter" />
+    </ContentPage.Resources>
+
+    <ContentPage.Content>
+        <ScrollView>
+            <VerticalStackLayout Spacing="10" Padding="20">
+
+                <!-- Loading Indicator: Visible when IsBusy is true -->
+                <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
+                                   HorizontalOptions="Center" VerticalOptions="CenterAndExpand"
+                                   Color="{AppThemeBinding Light=#512BD4, Dark=#2B0B98}"/>
+
+                <!-- Incident Details Section: Hidden when IsBusy is true using the converter -->
+                <VerticalStackLayout IsVisible="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}">
+                    <Label Text="Incident Details" FontSize="Large" FontAttributes="Bold" Margin="0,0,0,10"/>
+
+                    <!-- Grid to display key-value pairs of incident properties -->
+                    <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto" RowSpacing="5">
+                        <Label Grid.Row="0" Grid.Column="0" Text="Naam:" FontAttributes="Bold"/>
+                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding Incident.Name}"/>
+
+                        <Label Grid.Row="1" Grid.Column="0" Text="Beschrijving:" FontAttributes="Bold"/>
+                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding Incident.Description}" LineBreakMode="WordWrap"/>
+
+                        <Label Grid.Row="2" Grid.Column="0" Text="Locatie:" FontAttributes="Bold"/>
+                        <Label Grid.Row="2" Grid.Column="1" Text="{Binding Incident.Location.Address}"/>
+
+                        <Label Grid.Row="3" Grid.Column="0" Text="Prioriteit:" FontAttributes="Bold"/>
+                        <Label Grid.Row="3" Grid.Column="1" Text="{Binding Incident.Prio}"/>
+
+                        <Label Grid.Row="4" Grid.Column="0" Text="Datum:" FontAttributes="Bold"/>
+                        <Label Grid.Row="4" Grid.Column="1" Text="{Binding Incident.date, StringFormat='{0:dd-MM-yyyy HH:mm}'}"/>
+
+                        <!-- Assuming 'User' object has a 'Name' property, otherwise adjust this binding -->
+                        <Label Grid.Row="5" Grid.Column="0" Text="Gemeld door:" FontAttributes="Bold"/>
+                        <Label Grid.Row="5" Grid.Column="1" Text="{Binding Incident.UserName, FallbackValue='Onbekend'}"/>
+
+                        <!-- Displaying PictureUrl if available -->
+                        <Label Grid.Row="6" Grid.Column="0" Text="Afbeelding:" FontAttributes="Bold" IsVisible="{Binding Incident.PictureUrl, Converter={StaticResource InverseBoolConverter}}"/>
+                        <Image Grid.Row="6" Grid.Column="1" Source="{Binding Incident.PictureUrl}" 
+                               Aspect="AspectFit" HeightRequest="200" WidthRequest="200"
+                               IsVisible="{Binding Incident.PictureUrl, Converter={StaticResource InverseBoolConverter}}"/>
+                        <Label Grid.Row="7" Grid.Column="1" Text="Geen afbeelding beschikbaar." FontAttributes="Italic" TextColor="Gray"
+                               IsVisible="{Binding Incident.PictureUrl, TargetNullValue=True}"/>
+
+                        <!-- Optional: Displaying Status History -->
+                        <Label Grid.Row="8" Grid.Column="0" Text="Historie:" FontAttributes="Bold" VerticalOptions="Start" />
+                        <CollectionView Grid.Row="8" Grid.Column="1" ItemsSource="{Binding Incident.History}"
+                                        HeightRequest="{Binding Incident.History.Count, Converter={StaticResource HistoryHeightConverter}}">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Label Text="{Binding Status, StringFormat='- {0}'}" />
+                                    <!-- You might want to display more details from StatusUpdate, e.g., Timestamp -->
+                                    <!-- <Label Text="{Binding Status, StringFormat='- {0} ({1:dd-MM-yyyy})'}" /> -->
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </Grid>
+
+                    <!-- Add more details here as needed, following the same Grid pattern -->
+
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+    </ContentPage.Content>
+
+
+
 </ContentPage>

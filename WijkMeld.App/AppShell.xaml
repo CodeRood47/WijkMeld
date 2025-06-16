@@ -24,5 +24,10 @@
         ContentTemplate="{DataTemplate local:ReportIncidentView}"
         Route="reportincident" />
 
+    <ShellContent
+        Title="Incident Details"
+        ContentTemplate="{DataTemplate local:IncidentDetailView}"
+        Route="incidentdetails" />
+
 
 </Shell>

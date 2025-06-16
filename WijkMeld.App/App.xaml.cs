@@ -32,19 +32,7 @@ namespace WijkMeld.App
                     return new Window(new AppShell());
         }
 
-        //public App()
-        //{
-        //    InitializeComponent();
-        //    MainPage = new ContentPage
-        //    {
-        //        Content = new Label
-        //        {
-        //            Text = "Start gelukt!",
-        //            VerticalOptions = LayoutOptions.Center,
-        //            HorizontalOptions = LayoutOptions.Center
-        //        }
-        //    };
-        //}
+
 
 
 

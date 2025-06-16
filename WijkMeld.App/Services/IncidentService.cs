@@ -11,6 +11,7 @@ using WijkMeld.App.Model;
 using WijkMeld.App.Model.Enums;
 using System.Security.Cryptography.X509Certificates;
 using System.Net;
+using System.Diagnostics;
 
 namespace WijkMeld.App.Services
 {
@@ -44,7 +45,7 @@ namespace WijkMeld.App.Services
                 return null;
             }
 
-         
+
 
 
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
@@ -70,7 +71,7 @@ namespace WijkMeld.App.Services
             }
 
         }
-    
+
         public async Task<List<Incident>?> GetAllIncidentsAsync()
         {
             var token = await _authenticationService.GetTokenAsync();
@@ -89,7 +90,7 @@ namespace WijkMeld.App.Services
             catch (HttpRequestException ex)
             {
                 System.Diagnostics.Debug.WriteLine($"IncidentService: Fout bij ophalen ALLE incidenten: {ex.Message}");
-           
+
                 if (ex.StatusCode == HttpStatusCode.Unauthorized)
                 {
                     // Alleen uitloggen als het een ingelogde gebruiker betreft, niet voor gasten
@@ -140,6 +141,38 @@ namespace WijkMeld.App.Services
                     await _authenticationService.LogoutAsync();
                 }
                 return false;
+            }
+        }
+
+        public async Task<Incident?> GetIncidentByIdAsync(Guid incidentId)
+        {
+            if (!_authenticationService.IsUserLoggedIn())
+            {
+                System.Diagnostics.Debug.WriteLine("IncidentService: Gebruiker is niet ingelogd, kan incident niet ophalen.");
+                return null;
+            }
+            var token = await _authenticationService.GetTokenAsync();
+            if (string.IsNullOrEmpty(token))
+            {
+                System.Diagnostics.Debug.WriteLine("IncidentService: JWT token niet gevonden, kan incident niet ophalen.");
+                return null;
+            }
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            try
+            {
+                var response = await _httpClient.GetAsync($"Api/Incidents/{incidentId}");
+                Debug.WriteLine($"IncidentService: Aanroep GET /api/Incidents/{incidentId} met token {token}");
+                response.EnsureSuccessStatusCode();
+                return await response.Content.ReadFromJsonAsync<Incident>();
+            }
+            catch (HttpRequestException ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"IncidentService: Fout bij het ophalen van incident met ID {incidentId}: {ex.Message}");
+                if (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    await _authenticationService.LogoutAsync();
+                }
+                return null;
             }
         }
     }
