@@ -13,47 +13,62 @@ namespace WijkMeld.App.ViewModels
 {
     public partial class LoginViewModel : BaseViewModel
     {
-        private readonly AuthenticationService _authService;
-        private readonly NavigationService _navigationService;
+        private readonly IAuthenticationService _authService;
+        private readonly INavigationService _navigationService;
 
         [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(LoginCommand))]
         private string email;
 
         [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(LoginCommand))]
         private string password;
 
         [ObservableProperty]
         private string errorMessage;
 
 
-        public ICommand LoginCommand { get; }
+        public IAsyncRelayCommand LoginCommand { get; }
 
 
-        public LoginViewModel(AuthenticationService authService, NavigationService navigationService)
+        public LoginViewModel(IAuthenticationService authService, INavigationService navigationService)
         {
             _authService = authService;
             _navigationService = navigationService;
-            LoginCommand = new Command(async () => await LoginAsync());
+            LoginCommand = new AsyncRelayCommand(LoginAsync, CanLoginExecute);
         }
 
         private async Task LoginAsync()
         {
+            IsBusy = true;
             ErrorMessage = "";
-
-            var success = await _authService.LoginAsync(new LoginRequest
+            try
             {
-                Email = Email,
-                Password = Password
 
-            });
+                var success = await _authService.LoginAsync(new LoginRequest
+                {
+                    Email = Email,
+                    Password = Password
 
-            if (success)
-            {
-                await _navigationService.GoToAsync("//home");
+                });
+
+                if (success)
+                {
+                    await _navigationService.GoToAsync("//home");
+                }
+                else
+                {
+                    ErrorMessage = "Inloggen mislukt. Controleer je gegevens.";
+                }
             }
-            else
+            catch (Exception ex)
             {
-                ErrorMessage = "Inloggen mislukt. Controleer je gegevens.";
+                ErrorMessage = "Er is een onverwachte fout opgetreden tijdens het inloggen. Probeer het later opnieuw.";
+                Debug.WriteLine($"LoginViewModel: LoginAsync exception: {ex.Message}");
+            }
+            finally
+            {
+                IsBusy = false;
             }
         }
 
@@ -81,7 +96,7 @@ namespace WijkMeld.App.ViewModels
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Er is een fout opgetreden bij anoniem melden: {ex.Message}";
+                ErrorMessage = $"Er is een fout opgetreden bij anoniem melden";
                 Debug.WriteLine($"LoginViewModel: Anoniem melden exception: {ex.Message}");
             }
             finally
@@ -113,5 +128,9 @@ namespace WijkMeld.App.ViewModels
             }
 
         }
+
+        public bool CanLoginExecute() => !string.IsNullOrWhiteSpace(Email) &&
+                                 !string.IsNullOrWhiteSpace(Password) &&
+                                 !IsBusy;
     }   
 }

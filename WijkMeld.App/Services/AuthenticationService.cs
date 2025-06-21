@@ -11,7 +11,7 @@ using System.Diagnostics;
 
 namespace WijkMeld.App.Services
 {
-    public class AuthenticationService
+    public class AuthenticationService : IAuthenticationService
     {
         private readonly HttpClient _httpClient;
         private bool _isLoggedIn;
@@ -69,24 +69,7 @@ namespace WijkMeld.App.Services
             return IsLoggedIn && !string.IsNullOrEmpty(CurrentUserId);
         }
 
-        // dit kan waarschijnlijk weg
-        //private async Task<bool> CheckStoredLoginStatusAsync()
-        //{
-
-
-        //    try
-        //    {
-        //        var token = await SecureStorage.GetAsync("jwt_token");
-        //        var userId = await SecureStorage.GetAsync("user_id");
-        //        return !string.IsNullOrEmpty(token);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Log the exception if SecureStorage access fails
-        //        System.Diagnostics.Debug.WriteLine($"Error checking stored login status: {ex.Message}");
-        //        return false;
-        //    }
-        //}
+      
 
         public async Task<bool> LoginAsync(LoginRequest request)
         {

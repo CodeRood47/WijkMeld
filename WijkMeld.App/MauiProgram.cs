@@ -60,6 +60,7 @@ namespace WijkMeld.App
             //});
 
             builder.Services.AddSingleton<INavigationService, NavigationService>();
+            builder.Services.AddSingleton<IAuthenticationService, AuthenticationService>();
 
             builder.Services.AddTransient<IncidentService>();
             builder.Services.AddSingleton<AuthenticationService>();
