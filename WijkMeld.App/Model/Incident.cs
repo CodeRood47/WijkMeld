@@ -18,21 +18,27 @@ namespace WijkMeld.App.Model
 
         public User? user { get; set; }
 
+        [JsonPropertyName("userId")]
+        public Guid UserId { get; set; }
+
         [JsonPropertyName("userName")] 
         public string UserName { get; set; }
 
         public Location Location { get; set; }
 
-        public string? PictureUrl { get; set; }
 
         public Priority Prio { get; set; }
 
-        [JsonPropertyName("created")] // Matcht met de "created" in de JSON-respons
+        [JsonPropertyName("created")] 
         public DateTime date { get; set; } 
 
         [JsonPropertyName("status")] 
         public Status Status { get; set; }
 
+        [JsonPropertyName("history")]
         public List<StatusUpdate>? History { get; set; }
+
+        [JsonPropertyName("photoFilePaths")]
+        public List<string>? PhotoFilePaths { get; set; } = new();
     }
 }

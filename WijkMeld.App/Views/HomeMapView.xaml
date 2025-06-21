@@ -29,7 +29,7 @@
                    HorizontalOptions="Center"
                    Margin="0,10,0,0" />
 
-            <!-- CollectionView om de lijst met incidenten weer te geven -->
+        
             <CollectionView ItemsSource="{Binding Incidents}"
                             SelectionMode="None"
                             HeightRequest="250"
@@ -48,7 +48,7 @@
                     </StackLayout>
                 </CollectionView.EmptyView>
                 <CollectionView.ItemTemplate>
-                    <!-- x:DataType is belangrijk voor IntelliSense en compileertijd controles -->
+         
                     <DataTemplate x:DataType="models:Incident">
                         <Frame Margin="5" Padding="10" CornerRadius="10" HasShadow="True">
 
@@ -69,11 +69,7 @@
                                     <!-- Toont de Priority (Prio) van het incident -->
                                     <Label Grid.Column="1" Text="{Binding Prio, StringFormat='Prioriteit: {0}'}" FontSize="12" TextColor="Gray" HorizontalTextAlignment="End" />
                                 </Grid>
-                                <!-- Optioneel: Toon PictureUrl of Location (afhankelijk van hoe je die wilt weergeven) -->
-                                <!-- Voor een PictureUrl, kun je een Image control gebruiken: -->
-                                <!-- <Image Source="{Binding PictureUrl}" HeightRequest="100" Aspect="AspectFit" IsVisible="{Binding PictureUrl, Converter={StaticResource IsNotNullOrEmptyConverter}}" /> -->
-                                <!-- Voor Location, zul je waarschijnlijk de eigenschappen van het Location object moeten binden: -->
-                                <!-- <Label Text="{Binding Location.Address, StringFormat='Locatie: {0}'}" FontSize="12" TextColor="Gray" /> -->
+                              
                             </StackLayout>
                         </Frame>
                     </DataTemplate>

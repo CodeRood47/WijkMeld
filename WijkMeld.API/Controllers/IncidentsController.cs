@@ -181,7 +181,7 @@ namespace WijkMeld.API.Controllers
             return Ok("Incident status succesvol bijgewerkt."); // 200 OK
         }
 
-        [HttpPost("{id}/upload-photo")]
+        [HttpPost("{id}/photo")]
         public async Task<IActionResult> UploadPhoto(Guid id, IFormFile file, [FromServices] IWebHostEnvironment env, [FromServices] WijkMeldContext dbContext)
         {
             var incident = await _incidentRepository.GetByIdAsync(id);
@@ -191,24 +191,24 @@ namespace WijkMeld.API.Controllers
             if (file == null || file.Length == 0)
                 return BadRequest("Geen geldig bestand ontvangen.");
 
-            // 1. Pad maken
+            //Create path
             var uploadsFolder = Path.Combine(env.WebRootPath, "uploads", "incidents", id.ToString());
             Directory.CreateDirectory(uploadsFolder);
 
-            // 2. Unieke bestandsnaam maken
+            // unique file name
             var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
             var fullPath = Path.Combine(uploadsFolder, fileName);
 
-            // 3. Bestand opslaan
+            // save file
             using (var stream = new FileStream(fullPath, FileMode.Create))
             {
                 await file.CopyToAsync(stream);
             }
 
-            // 4. Relatief pad voor toegang in frontend
+            // create relative path for front end access
             var relativePath = Path.Combine("/uploads/incidents", id.ToString(), fileName).Replace("\\", "/");
 
-            // 5. Opslaan in database
+            // save to db
             var incidentPhoto = new IncidentPhoto
             {
                 IncidentId = id,

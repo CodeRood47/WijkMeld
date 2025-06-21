@@ -11,6 +11,7 @@ namespace WijkMeld.App
             Routing.RegisterRoute("home", typeof(HomeMapView));
             Routing.RegisterRoute("reportincident", typeof(ReportIncidentView));
             Routing.RegisterRoute("incidentdetails", typeof(IncidentDetailView));
+            Routing.RegisterRoute("register", typeof(RegisterView));
         }
     }
 }

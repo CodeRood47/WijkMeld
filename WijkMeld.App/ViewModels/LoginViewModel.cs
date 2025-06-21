@@ -88,5 +88,27 @@ namespace WijkMeld.App.ViewModels
             }
         }
 
-    }
+
+        [RelayCommand]
+        public async Task NavigateToRegisterAsync()
+        {
+            Debug.WriteLine("LoginViewModel: NavigateToRegisterAsync commando gestart.");
+            IsBusy = true;
+            try
+            {
+                await Shell.Current.GoToAsync("//register");
+                Debug.WriteLine("LoginViewModel: Navigatie naar registratiepagina voltooid.");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"LoginViewModel: Fout bij navigeren naar registratiepagina: {ex.Message}");
+            }
+            finally
+            {
+                IsBusy = false;
+                Debug.WriteLine("LoginViewModel: NavigateToRegisterAsync commando voltooid.");
+            }
+
+        }
+    }   
 }

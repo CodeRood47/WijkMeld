@@ -9,7 +9,6 @@ using System.Text;
 using System.Threading.Tasks;
 using WijkMeld.App.Model;
 using WijkMeld.App.Model.Enums;
-using System.Security.Cryptography.X509Certificates;
 using System.Net;
 using System.Diagnostics;
 
@@ -28,11 +27,24 @@ namespace WijkMeld.App.Services
             _authenticationService = authenticationService;
         }
 
+         public Uri? GetApiBaseAddress()
+        {
+
+            if (DeviceInfo.Platform == DevicePlatform.Android)
+            {
+                return new Uri("http://10.0.2.2:5079");
+            }
+            else
+            {
+                return new Uri("https://localhost:7226");
+            }
+        }
+
         public async Task<List<Incident>?> GetUserIncidentsAsync()
         {
             if (!_authenticationService.IsUserLoggedIn())
             {
-                System.Diagnostics.Debug.WriteLine("IncidentService: Gebruiker is niet ingelogd, kan incidenten niet ophalen.");
+                Debug.WriteLine("IncidentService: Gebruiker is niet ingelogd, kan incidenten niet ophalen.");
                 return null;
             }
 
@@ -40,7 +52,7 @@ namespace WijkMeld.App.Services
             var userId = await _authenticationService.GetUserIdAsync();
             if (string.IsNullOrEmpty(token))
             {
-                System.Diagnostics.Debug.WriteLine("IncidentService: JWT token niet gevonden, kan incidenten niet ophalen.");
+                Debug.WriteLine("IncidentService: JWT token niet gevonden, kan incidenten niet ophalen.");
 
                 return null;
             }
@@ -59,7 +71,7 @@ namespace WijkMeld.App.Services
             }
             catch (HttpRequestException ex)
             {
-                System.Diagnostics.Debug.WriteLine("IncidentService: Fout bij het ophalen van incidenten.");
+                Debug.WriteLine("IncidentService: Fout bij het ophalen van incidenten.");
 
                 if (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
@@ -72,28 +84,77 @@ namespace WijkMeld.App.Services
 
         }
 
+        //public async Task<List<Incident>?> GetAllIncidentsAsync()
+        //{
+        //    var token = await _authenticationService.GetTokenAsync();
+
+
+        //    try
+        //    {
+
+        //        var response = await _httpClient.GetAsync("Api/Incidents"); 
+        //        response.EnsureSuccessStatusCode();
+
+        //        return await response.Content.ReadFromJsonAsync<List<Incident>>();
+        //    }
+        //    catch (HttpRequestException ex)
+        //    {
+        //        Debug.WriteLine($"IncidentService: Fout bij ophalen ALLE incidenten: {ex.Message}");
+
+        //        if (ex.StatusCode == HttpStatusCode.Unauthorized)
+        //        {
+        //            // Alleen uitloggen als het een ingelogde gebruiker betreft, niet voor gasten
+        //            if (_authenticationService.IsUserLoggedIn())
+        //            {
+        //                await _authenticationService.LogoutAsync();
+        //            }
+        //        }
+        //        return null;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Debug.WriteLine($"IncidentService: Algemene fout bij ophalen ALLE incidenten: {ex.Message}");
+        //        return null;
+        //    }
+        //}
+
         public async Task<List<Incident>?> GetAllIncidentsAsync()
         {
             var token = await _authenticationService.GetTokenAsync();
-            //_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+          
+            if (!string.IsNullOrEmpty(token))
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            }
+            else
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = null; 
+            }
 
 
             try
             {
-                // Pas dit endpoint aan naar het daadwerkelijke API endpoint voor alle incidenten
-                // Bijvoorbeeld: "api/Incidents/all" of gewoon "api/Incidents" (als POST/GET zonder ID)
-                var response = await _httpClient.GetAsync("Api/Incidents"); // Aanname: GET /api/Incidents geeft alle incidenten
+               
+                var response = await _httpClient.GetAsync("Api/Incidents");
                 response.EnsureSuccessStatusCode();
 
-                return await response.Content.ReadFromJsonAsync<List<Incident>>();
+          
+                var jsonContent = await response.Content.ReadAsStringAsync();
+                if (string.IsNullOrWhiteSpace(jsonContent) || jsonContent.Trim().Equals("null", StringComparison.OrdinalIgnoreCase))
+                {
+                    Debug.WriteLine("IncidentService: Lege of null respons ontvangen voor ALLE incidenten.");
+                    return new List<Incident>();
+                }
+
+                var incidents = await response.Content.ReadFromJsonAsync<List<Incident>>();
+                return incidents ?? new List<Incident>(); 
             }
             catch (HttpRequestException ex)
             {
-                System.Diagnostics.Debug.WriteLine($"IncidentService: Fout bij ophalen ALLE incidenten: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"IncidentService: Fout bij ophalen ALLE incidenten: {ex.StatusCode} - {ex.Message}");
 
                 if (ex.StatusCode == HttpStatusCode.Unauthorized)
                 {
-                    // Alleen uitloggen als het een ingelogde gebruiker betreft, niet voor gasten
                     if (_authenticationService.IsUserLoggedIn())
                     {
                         await _authenticationService.LogoutAsync();
@@ -113,34 +174,57 @@ namespace WijkMeld.App.Services
 
 
 
-        public async Task<bool> CreateIncidentAsync(CreateIncidentRequest request)
+
+        public async Task<Guid> CreateIncidentAsync(CreateIncidentRequest request) 
         {
             if (!_authenticationService.IsUserLoggedIn())
             {
-                System.Diagnostics.Debug.WriteLine("IncidentService: Gebruiker is niet ingelogd, kan incident niet aanmaken.");
-                return false;
+                Debug.WriteLine("IncidentService: Gebruiker is niet ingelogd, kan incident niet aanmaken.");
+                return Guid.Empty; 
             }
+
             var token = await _authenticationService.GetTokenAsync();
             if (string.IsNullOrEmpty(token))
             {
-                System.Diagnostics.Debug.WriteLine("IncidentService: JWT token niet gevonden, kan incident niet aanmaken.");
-                return false;
+                Debug.WriteLine("IncidentService: JWT token niet gevonden, kan incident niet aanmaken.");
+                return Guid.Empty;
             }
+
+          
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
             try
             {
                 var response = await _httpClient.PostAsJsonAsync("api/Incidents", request);
-                response.EnsureSuccessStatusCode();
-                return true;
+                response.EnsureSuccessStatusCode(); // Gooit een uitzondering voor 4xx/5xx statuscodes
+
+                var result = await response.Content.ReadFromJsonAsync<CreateIncidentResponse>();
+
+                if (result != null && result.Id != Guid.Empty)
+                {
+                    Debug.WriteLine($"Incident succesvol aangemaakt. Ontvangen ID: {result.Id}");
+                    return result.Id; // return received guid from the response
+                }
+                else
+                {
+                    Debug.WriteLine("Incident aanmaken mislukt: ID ontbreekt in de respons of is leeg.");
+                    return Guid.Empty; // return Guid.Empty if the ID is not present or empty
+                }
             }
             catch (HttpRequestException ex)
             {
-                System.Diagnostics.Debug.WriteLine($"IncidentService: Fout bij het aanmaken van incident: {ex.Message}");
-                if (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                Debug.WriteLine($"IncidentService: HttpRequestException bij aanmaken incident: {ex.Message}");
+
+                if (ex.StatusCode == HttpStatusCode.Unauthorized)
                 {
                     await _authenticationService.LogoutAsync();
                 }
-                return false;
+                return Guid.Empty; // Retourneer Guid.Empty bij een HttpRequestException
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"IncidentService: Onverwachte fout bij aanmaken incident: {ex.Message}");
+                return Guid.Empty; // Retourneer Guid.Empty bij andere uitzonderingen
             }
         }
 
@@ -148,13 +232,13 @@ namespace WijkMeld.App.Services
         {
             if (!_authenticationService.IsUserLoggedIn())
             {
-                System.Diagnostics.Debug.WriteLine("IncidentService: Gebruiker is niet ingelogd, kan incident niet ophalen.");
+                Debug.WriteLine("IncidentService: Gebruiker is niet ingelogd, kan incident niet ophalen.");
                 return null;
             }
             var token = await _authenticationService.GetTokenAsync();
             if (string.IsNullOrEmpty(token))
             {
-                System.Diagnostics.Debug.WriteLine("IncidentService: JWT token niet gevonden, kan incident niet ophalen.");
+                Debug.WriteLine("IncidentService: JWT token niet gevonden, kan incident niet ophalen.");
                 return null;
             }
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
@@ -167,12 +251,85 @@ namespace WijkMeld.App.Services
             }
             catch (HttpRequestException ex)
             {
-                System.Diagnostics.Debug.WriteLine($"IncidentService: Fout bij het ophalen van incident met ID {incidentId}: {ex.Message}");
+                Debug.WriteLine($"IncidentService: Fout bij het ophalen van incident met ID {incidentId}: {ex.Message}");
                 if (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
                     await _authenticationService.LogoutAsync();
                 }
                 return null;
+            }
+        }
+        public async Task<bool> UploadIncidentPhotoAsync(IncidentPhoto photo, Guid incidentId)
+        {
+            if (!_authenticationService.IsUserLoggedIn())
+            {
+                System.Diagnostics.Debug.WriteLine("IncidentService: Gebruiker is niet ingelogd, kan foto niet uploaden.");
+                return false;
+            }
+
+            var token = await _authenticationService.GetTokenAsync();
+            if (string.IsNullOrEmpty(token))
+            {
+                System.Diagnostics.Debug.WriteLine("IncidentService: JWT token niet gevonden, kan foto niet uploaden.");
+                return false;
+            }
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            if (photo.PhotoStream == null)
+            {
+                Debug.WriteLine("IncidentService: PhotoStream is null, kan foto niet uploaden.");
+                return false;
+            }
+
+            try
+            {
+              
+                var requestUrl = $"Api/Incidents/{incidentId}/photo"; 
+
+                using (var content = new MultipartFormDataContent())
+                {
+                    
+                    content.Add(new StreamContent(photo.PhotoStream), "file", photo.FileName);
+
+                    var response = await _httpClient.PostAsync(requestUrl, content);
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        string errorContent = await response.Content.ReadAsStringAsync();
+                        Debug.WriteLine($"IncidentService: Fout bij uploaden foto voor incident {incidentId} (HTTP {response.StatusCode}): {errorContent}");
+
+                        if (response.StatusCode == HttpStatusCode.Unauthorized)
+                        {
+                            await _authenticationService.LogoutAsync();
+                        }
+                        return false; 
+                    }
+
+                    Debug.WriteLine($"Foto '{photo.FileName}' succesvol geüpload voor incident {incidentId}.");
+                    return true;
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+         
+                Debug.WriteLine($"IncidentService: HttpRequestException bij uploaden foto voor incident {incidentId}: {ex.Message}");
+
+                if (ex.StatusCode == HttpStatusCode.Unauthorized) 
+                {
+                    await _authenticationService.LogoutAsync();
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"IncidentService: Onverwachte fout bij uploaden foto: {ex.Message}");
+                return false;
+            }
+            finally
+            {
+               
+                photo.PhotoStream?.Dispose();
             }
         }
     }

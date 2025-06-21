@@ -28,6 +28,10 @@
         Title="Incident Details"
         ContentTemplate="{DataTemplate local:IncidentDetailView}"
         Route="incidentdetails" />
+    <ShellContent
+        Title="Register"
+        ContentTemplate="{DataTemplate local:RegisterView}"
+        Route="register" />
 
 
 </Shell>

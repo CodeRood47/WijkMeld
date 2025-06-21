@@ -33,13 +33,13 @@ namespace WijkMeld.App.Services
             _httpClient = httpClientFactory.CreateClient("ApiClient");
             _currentUserRole = UserRole.GUEST;
             _isLoggedIn = false;
-            System.Diagnostics.Debug.WriteLine("AuthenticationService constructor voltooid.");
+            Debug.WriteLine("AuthenticationService constructor voltooid.");
 
         }
 
           public async Task InitializeAsync()
         {
-            System.Diagnostics.Debug.WriteLine("AuthenticationService InitializeAsync gestart.");
+            Debug.WriteLine("AuthenticationService InitializeAsync gestart.");
             var token = await SecureStorage.GetAsync("jwt_token");
             var userId = await SecureStorage.GetAsync("user_id");
             var userRole = await SecureStorage.GetAsync("user_role");
@@ -212,6 +212,32 @@ namespace WijkMeld.App.Services
             }
         }
 
+        public async Task<bool> RegisterUserAsync(RegisterRequest request)
+        {
+            try
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = null;
+
+                string registerPayload = System.Text.Json.JsonSerializer.Serialize(request);
+                Debug.WriteLine($"[MAUI-DEBUG] AuthenticationService: Verzenden van RegisterUserAsync request. JSON payload: {registerPayload}");
+
+                var response = await _httpClient.PostAsJsonAsync("api/Users", request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    string errorContent = await response.Content.ReadAsStringAsync();
+                    Debug.WriteLine($"API Registratie mislukt: {response.StatusCode}. Response: {errorContent}");
+                    return false;
+                }
+                System.Diagnostics.Debug.WriteLine("API Registratie succesvol.");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Fout bij registratie: {ex.Message}");
+                throw;
+            }
+        }
         public async Task LogoutAsync()
         {
             SecureStorage.Remove("jwt_token");

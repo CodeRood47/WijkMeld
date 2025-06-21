@@ -6,6 +6,8 @@ using WijkMeld.API.Repositories;
 using WijkMeld.API.Repositories.Users;
 using WijkMeld.API.Services;
 using System.Security.Cryptography;
+using Microsoft.AspNetCore.Authorization;
+using System.Diagnostics;
 
 
 namespace WijkMeld.API.Controllers
@@ -77,6 +79,7 @@ namespace WijkMeld.API.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> Create(CreateUserDto dto)
         {
             var hashedPassword = ComputeHash(dto.PasswordHash);
@@ -89,6 +92,7 @@ namespace WijkMeld.API.Controllers
                 PasswordHash = hashedPassword,
                 Role = dto.Role
             };
+            Debug.WriteLine($"Creating user: {user.UserName} with email: {user.Email} and role: {user.Role}");
             await _repository.AddAsync(user);
             return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
 

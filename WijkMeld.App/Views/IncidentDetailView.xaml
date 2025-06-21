@@ -3,13 +3,19 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:WijkMeld.App.ViewModels"
              xmlns:converters="clr-namespace:WijkMeld.App.Converters"
+             xmlns:graphics="clr-namespace:Microsoft.Maui.Graphics;assembly=Microsoft.Maui"
              x:DataType="viewmodels:IncidentDetailViewModel"
              x:Class="WijkMeld.App.Views.IncidentDetailView"
               Title="{Binding Title}">
 
     <ContentPage.Resources>
-        <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+        
         <converters:HistoryHeightConverter x:Key="HistoryHeightConverter" />
+        <converters:NumberToBoolConverter x:Key="NumberToBoolConverter" />
+        <converters:InverseNumberToBoolConverter x:Key="InverseNumberToBoolConverter" />
+        <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+        <converters:StringToBoolConverter x:Key="StringToBoolConverter" />
+
     </ContentPage.Resources>
 
     <ContentPage.Content>
@@ -47,12 +53,31 @@
                         <Label Grid.Row="5" Grid.Column="1" Text="{Binding Incident.UserName, FallbackValue='Onbekend'}"/>
 
                         <!-- Displaying PictureUrl if available -->
-                        <Label Grid.Row="6" Grid.Column="0" Text="Afbeelding:" FontAttributes="Bold" IsVisible="{Binding Incident.PictureUrl, Converter={StaticResource InverseBoolConverter}}"/>
-                        <Image Grid.Row="6" Grid.Column="1" Source="{Binding Incident.PictureUrl}" 
-                               Aspect="AspectFit" HeightRequest="200" WidthRequest="200"
-                               IsVisible="{Binding Incident.PictureUrl, Converter={StaticResource InverseBoolConverter}}"/>
-                        <Label Grid.Row="7" Grid.Column="1" Text="Geen afbeelding beschikbaar." FontAttributes="Italic" TextColor="Gray"
-                               IsVisible="{Binding Incident.PictureUrl, TargetNullValue=True}"/>
+                        <Label Grid.Row="7" Grid.Column="0" Text="Foto's:" FontAttributes="Bold" VerticalOptions="Start"
+                           IsVisible="{Binding FullPhotoUrls.Count, Converter={StaticResource NumberToBoolConverter}}"/>
+                        <CollectionView Grid.Row="7" Grid.Column="1" ItemsSource="{Binding FullPhotoUrls}" HeightRequest="150"
+                                    IsVisible="{Binding FullPhotoUrls.Count, Converter={StaticResource NumberToBoolConverter}}">
+                            <CollectionView.ItemsLayout>
+                                <LinearItemsLayout Orientation="Horizontal" ItemSpacing="10" />
+                            </CollectionView.ItemsLayout>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="x:String">
+
+                                    <Border Padding="5" BackgroundColor="#F0F0F0" WidthRequest="140" HeightRequest="140">
+                                     
+                                        
+                                        <Image Source="{Binding .}" 
+                                            Aspect="AspectFill"
+                                           WidthRequest="130"
+                                           HeightRequest="130" />
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                        <!-- Alternatieve text for photos -->
+                        <Label Grid.Row="7" Grid.Column="1" Text="Geen afbeeldingen beschikbaar." FontAttributes="Italic" TextColor="Gray"
+                           IsVisible="{Binding PhotoFilePaths.Count, Converter={StaticResource InverseNumberToBoolConverter}}"/>
+
 
                         <!-- Optional: Displaying Status History -->
                         <Label Grid.Row="8" Grid.Column="0" Text="Historie:" FontAttributes="Bold" VerticalOptions="Start" />

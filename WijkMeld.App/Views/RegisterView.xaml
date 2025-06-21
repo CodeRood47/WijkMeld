@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:WijkMeld.App.ViewModels"
+             x:Class="WijkMeld.App.Views.RegisterView"
+             Title="{Binding Title}"
+             x:DataType="viewmodels:RegisterViewModel">
+    <VerticalStackLayout Spacing="15" Padding="20" VerticalOptions="CenterAndExpand">
+        <Label Text="Nieuwe gebruiker registreren" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" Margin="0,0,0,20"/>
+
+        <Entry Placeholder="Gebruikersnaam" Text="{Binding UserName, Mode=TwoWay}" ClearButtonVisibility="WhileEditing"/>
+        <Entry Placeholder="E-mailadres" Text="{Binding Email, Mode=TwoWay}" ClearButtonVisibility="WhileEditing" Keyboard="Email"/>
+        <Entry Placeholder="Wachtwoord" Text="{Binding Password, Mode=TwoWay}" IsPassword="True" ClearButtonVisibility="WhileEditing"/>
+        <Entry Placeholder="Herhaal wachtwoord" Text="{Binding ConfirmPassword, Mode=TwoWay}" IsPassword="True" ClearButtonVisibility="WhileEditing"/>
+
+        <Label Text="{Binding ErrorMessage}" TextColor="Red" HorizontalOptions="Center" Margin="0,10,0,0"/>
+
+        <Button Text="Registreren" Command="{Binding RegisterCommand}" IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"/>
+        <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" HorizontalOptions="Center"/>
+    </VerticalStackLayout>
+</ContentPage>

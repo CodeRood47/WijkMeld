@@ -37,26 +37,29 @@ namespace WijkMeld.App
 
             if (DeviceInfo.Platform == DevicePlatform.Android)
             {
-                // Dit is de URL voor Android Emulator om je localhost/IIS Express te bereiken
-                apiUrl = "https://10.0.2.2:7226";
+              
+                apiUrl = "http://10.0.2.2:5079";
             }
-            else // Voor Windows, iOS, Mac (localhost)
+            else 
             {
-                // Dit is de URL voor Windows-apps of andere platforms die localhost kunnen bereiken
+                
                 apiUrl = "https://localhost:7226";
             }
 
-            // Een basic check (minder cruciaal bij hardcoding, maar kan blijven)
+     
             if (string.IsNullOrWhiteSpace(apiUrl))
             {
                 throw new InvalidOperationException($"De API URL kon niet worden vastgesteld voor het huidige platform.");
             }
 
-            // --- Configureer HttpClient met behulp van de HttpClientConfigurator ---
-            // Deze lijn vervangt je hele AddSingleton(sp => { ... }) blok
-            HttpClientConfigurator.Configure(builder.Services, apiUrl);
 
-            // --- Registratie van je services (blijft hetzelfde) ---
+            HttpClientConfigurator.Configure(builder.Services, apiUrl);
+            //builder.Services.AddHttpClient("ApiClient", httpClient =>
+            //{
+            //    httpClient.BaseAddress = new Uri(apiUrl);
+            //});
+
+
             builder.Services.AddTransient<IncidentService>();
             builder.Services.AddSingleton<AuthenticationService>();
             builder.Services.AddSingleton<GeolocationService>();
@@ -65,11 +68,13 @@ namespace WijkMeld.App
             builder.Services.AddTransient<HomeMapViewModel>();
             builder.Services.AddTransient<ReportIncidentViewModel>();
             builder.Services.AddTransient<IncidentDetailViewModel>();
+            builder.Services.AddTransient<RegisterViewModel>();
 
             builder.Services.AddTransient<LoginView>();
             builder.Services.AddTransient<HomeMapView>();
             builder.Services.AddTransient<ReportIncidentView>();
             builder.Services.AddTransient<IncidentDetailView>();
+            builder.Services.AddTransient<RegisterView>();
 
 
 #if DEBUG

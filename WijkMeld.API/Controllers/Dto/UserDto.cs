@@ -8,7 +8,9 @@ namespace WijkMeld.API.Controllers.Dto
     public class UserResponseDto
     {
         public Guid Id { get; set; }
-        public string UserName { get; set; }
+        public required string UserName { get; set; }
+
+    
         public string Email { get; set; }
         public UserRole Role { get; set; }
 
@@ -19,21 +21,25 @@ namespace WijkMeld.API.Controllers.Dto
     public class CreateUserDto
     {
         [Required]
-        public string UserName { get; set; }
-        [Required]
-        public string PasswordHash { get; set; }
+        public required string UserName { get; set; }
+
         [Required]
         [EmailAddress]
-        public string Email { get; set; }
+        public required string Email { get; set; }
+
+        [Required]
+        public required string PasswordHash { get; set; }
+        [Required]
+      
         public UserRole Role { get; set; } = UserRole.USER;
     }
 
     public class UpdateUserDto
     {
         [Required]
-        public string UserName { get; set; }
+        public required string  UserName { get; set; }
         [Required]
-        [EmailAddress]
-        public string Email { get; set; }
+        //[EmailAddress]
+        public required string Email { get; set; }
     }
 }
