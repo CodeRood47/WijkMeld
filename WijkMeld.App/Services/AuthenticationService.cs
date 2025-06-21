@@ -240,9 +240,14 @@ namespace WijkMeld.App.Services
         }
         public async Task LogoutAsync()
         {
-            SecureStorage.Remove("jwt_token");
-            SecureStorage.Remove("user_id");
-            SecureStorage.Remove("user_role");
+            await Task.Run(() =>
+            {
+                SecureStorage.Remove("jwt_token");
+                SecureStorage.Remove("user_id");
+                SecureStorage.Remove("user_role");
+
+            });
+
             IsLoggedIn = false;
             _currentUserId = null;
         }

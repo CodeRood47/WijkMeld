@@ -18,6 +18,7 @@ namespace WijkMeld.App.ViewModels
     {
         private readonly IncidentService _incidentService;
         private readonly AuthenticationService _authenticationService;
+        private readonly NavigationService _navigationService;
 
         [ObservableProperty]
         private Incident? incident;
@@ -30,11 +31,12 @@ namespace WijkMeld.App.ViewModels
 
         private Guid _currentIncidentGuidId;
 
-        public IncidentDetailViewModel(IncidentService incidentService, AuthenticationService authenticationService)
+        public IncidentDetailViewModel(IncidentService incidentService, AuthenticationService authenticationService, NavigationService navigationService)
         {
             _incidentService = incidentService;
             _authenticationService = authenticationService;
             Title = "Incident Details";
+            _navigationService = navigationService;
         }
 
         async partial void OnIncidentIdAsStringChanged(string value)
@@ -53,10 +55,9 @@ namespace WijkMeld.App.ViewModels
                 }
                 else
                 {
-                    MainThread.BeginInvokeOnMainThread(async () =>
-                    {
-                        await Application.Current.MainPage.DisplayAlert("Fout", "Ongeldige incident ID.", "OK");
-                    });
+                   
+                   Debug.WriteLine("Fout", "Ongeldige incident ID.", "OK");
+                    
                 }
             }
             else
@@ -85,21 +86,13 @@ namespace WijkMeld.App.ViewModels
                     Debug.WriteLine($"IncidentDetailViewModel: Incident loaded successfully. Name: {Incident.Name}");
 
 
-                    //if (Incident.UserId != null)
-                    //{
-                    //    Debug.WriteLine($"IncidentDetailViewModel: User object is NOT null.");
-                    //    Debug.WriteLine($"IncidentDetailViewModel: User Name: {Incident.user.UserName ?? "NULL or Empty"}");
-                    //}
-                    //else
-                    //{
-                    //    Debug.WriteLine($"IncidentDetailViewModel: User object IS null. Cannot display user name.");
-                    //}
+
                 }
                 else
                 {
                     Debug.WriteLine($"IncidentDetailViewModel: Kon incident met ID {_currentIncidentGuidId} niet vinden.");
                   
-                    await Shell.Current.DisplayAlert("Fout", "Het opgevraagde incident kon niet worden gevonden.", "OK");
+                 
                 }
                 FullPhotoUrls.Clear();
                 
@@ -111,9 +104,7 @@ namespace WijkMeld.App.ViewModels
                     {
                         foreach (var relativePath in Incident.PhotoFilePaths)
                         {
-                            // Combineer de basis-URL met het relatieve pad
-                            // Zorg ervoor dat de relativePath niet al een absolute URL is als het al een domain bevat
-                            // en dat apiBaseUri eindigt met een '/' en relativePath begint met een '/'
+                            //Combine the base URI with the relative path to create the full URL
                             string fullUrl = new Uri(apiBaseUri, relativePath).ToString();
                             FullPhotoUrls.Add(fullUrl);
                             Debug.WriteLine($"Added full photo URL: {fullUrl}");
@@ -132,12 +123,7 @@ namespace WijkMeld.App.ViewModels
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"IncidentDetailViewModel: Fout bij laden incident details: {ex.Message}");
-
-                MainThread.BeginInvokeOnMainThread(async () =>
-                {
-                    await Application.Current.MainPage.DisplayAlert("Fout", "Er is een fout opgetreden bij het laden van de incidentdetails.", "OK");
-                });
+                Debug.WriteLine($"IncidentDetailViewModel: Fout bij laden incident details: {ex.Message}");               
               
             }
             finally
@@ -151,7 +137,7 @@ namespace WijkMeld.App.ViewModels
         [RelayCommand]
         public async Task GoBackAsync()
         {
-            await Shell.Current.GoToAsync("//home"); // Navigeer terug naar de vorige pagina
+            await _navigationService.GoToAsync("//home"); // Navigeer terug naar de vorige pagina
         }
 
 

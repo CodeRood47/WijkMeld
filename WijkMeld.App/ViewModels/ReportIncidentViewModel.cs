@@ -20,6 +20,7 @@ namespace WijkMeld.App.ViewModels
     {
         private readonly IncidentService _incidentService;
         private readonly GeolocationService _geolocationService;
+        private readonly INavigationService _navigationService;
 
         [ObservableProperty]
         private string name;
@@ -48,11 +49,12 @@ namespace WijkMeld.App.ViewModels
 
         public ObservableCollection<Priority> Priorities { get; } = new ObservableCollection<Priority>(Enum.GetValues(typeof(Priority)).Cast<Priority>());
 
-        public ReportIncidentViewModel(IncidentService incidentService, GeolocationService geolocationService)
+        public ReportIncidentViewModel(IncidentService incidentService, GeolocationService geolocationService, INavigationService navigationService)
         {
             Title = "Melding doen";
             _incidentService = incidentService;
             _geolocationService = geolocationService;
+            _navigationService = navigationService;
             selectedPriority = Priority.NORMAL;
         }
 
@@ -117,10 +119,9 @@ namespace WijkMeld.App.ViewModels
         {
             if(!MediaPicker.Default.IsCaptureSupported)
             {
-                MainThread.BeginInvokeOnMainThread(async () =>
-                {
-                    await Application.Current.MainPage.DisplayAlert("Fout", "Camera is niet beschikbaar op dit apparaat.", "OK");
-                });
+                
+                    Debug.WriteLine("Fout", "Camera is niet beschikbaar op dit apparaat.", "OK");
+                
                 return;
             }
 
@@ -132,7 +133,7 @@ namespace WijkMeld.App.ViewModels
                     status = await Permissions.RequestAsync<Permissions.Camera>();
                     if (status != PermissionStatus.Granted)
                     {
-                        await Application.Current.MainPage.DisplayAlert("Toestemming geweigerd", "Je moet cameratoegang verlenen om foto's te maken.", "OK");
+                        Debug.WriteLine("Toestemming geweigerd", "Je moet cameratoegang verlenen om foto's te maken.", "OK");
                         return;
                     }
                 }
@@ -169,17 +170,17 @@ namespace WijkMeld.App.ViewModels
             catch (FeatureNotSupportedException fnsEx)
             {
                 ErrorMessage = $"Camera functionaliteit niet ondersteund: {fnsEx.Message}";
-                await Application.Current.MainPage.DisplayAlert("Fout", ErrorMessage, "OK");
+                Debug.WriteLine("Fout", ErrorMessage, "OK");
             }
             catch (PermissionException pEx)
             {
                 ErrorMessage = $"Toestemming geweigerd voor camera: {pEx.Message}";
-                await Application.Current.MainPage.DisplayAlert("Fout", ErrorMessage, "OK");
+                Debug.WriteLine("Fout", ErrorMessage, "OK");
             }
             catch (Exception ex)
             {
                 ErrorMessage = $"Onverwachte fout bij maken foto: {ex.Message}";
-                await Application.Current.MainPage.DisplayAlert("Fout", ErrorMessage, "OK");
+                Debug.WriteLine("Fout", ErrorMessage, "OK");
                 Debug.WriteLine($"Fout bij foto maken: {ex.Message}");
             }
         }
@@ -194,7 +195,7 @@ namespace WijkMeld.App.ViewModels
                     status = await Permissions.RequestAsync<Permissions.Photos>();
                     if (status != PermissionStatus.Granted)
                     {
-                        await Application.Current.MainPage.DisplayAlert("Toestemming geweigerd", "Je moet toegang verlenen tot je fotogalerij om een foto te kiezen.", "OK");
+                        Debug.WriteLine("Toestemming geweigerd", "Je moet toegang verlenen tot je fotogalerij om een foto te kiezen.", "OK");
                         return;
                     }
                 }
@@ -228,17 +229,17 @@ namespace WijkMeld.App.ViewModels
             catch (FeatureNotSupportedException fnsEx)
             {
                 ErrorMessage = $"Fotogalerij functionaliteit niet ondersteund: {fnsEx.Message}";
-                await Application.Current.MainPage.DisplayAlert("Fout", ErrorMessage, "OK");
+                Debug.WriteLine("Fout", ErrorMessage, "OK");
             }
             catch (PermissionException pEx)
             {
                 ErrorMessage = $"Toestemming geweigerd voor fotogalerij: {pEx.Message}";
-                await Application.Current.MainPage.DisplayAlert("Fout", ErrorMessage, "OK");
+                Debug.WriteLine("Fout", ErrorMessage, "OK");
             }
             catch (Exception ex)
             {
                 ErrorMessage = $"Onverwachte fout bij kiezen foto: {ex.Message}";
-                await Application.Current.MainPage.DisplayAlert("Fout", ErrorMessage, "OK");
+                Debug.WriteLine("Fout", ErrorMessage, "OK");
                 Debug.WriteLine($"Fout bij foto kiezen: {ex.Message}");
             }
         }
@@ -312,8 +313,8 @@ namespace WijkMeld.App.ViewModels
                     IncidentPhotos.Clear(); 
 
                  
-                    await Shell.Current.GoToAsync("//home");
-                    await Application.Current.MainPage.DisplayAlert("Succes", "Incident en foto(s) succesvol gemeld!", "OK");
+                    await _navigationService.GoToAsync("//home");
+                    Debug.WriteLine("Succes", "Incident en foto(s) succesvol gemeld!", "OK");
                     Debug.WriteLine("Incident en foto's succesvol verwerkt.");
                 }
                 else

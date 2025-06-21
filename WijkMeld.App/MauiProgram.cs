@@ -59,10 +59,14 @@ namespace WijkMeld.App
             //    httpClient.BaseAddress = new Uri(apiUrl);
             //});
 
+            builder.Services.AddSingleton<INavigationService, NavigationService>();
 
             builder.Services.AddTransient<IncidentService>();
             builder.Services.AddSingleton<AuthenticationService>();
             builder.Services.AddSingleton<GeolocationService>();
+            builder.Services.AddSingleton<NavigationService>();
+            
+
 
             builder.Services.AddTransient<LoginViewModel>();
             builder.Services.AddTransient<HomeMapViewModel>();

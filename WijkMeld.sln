@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WijkMeld.Infrastructure", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WijkMeld.App", "WijkMeld.App\WijkMeld.App.csproj", "{3FA79D33-4A62-443D-8E5E-DF990D2187BB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WijkMeld.Tests", "WijkMeld.Tests\WijkMeld.Tests.csproj", "{2F73DF19-C6DD-492C-836B-F91D3141DB2D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,10 @@ Global
 		{3FA79D33-4A62-443D-8E5E-DF990D2187BB}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{3FA79D33-4A62-443D-8E5E-DF990D2187BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3FA79D33-4A62-443D-8E5E-DF990D2187BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F73DF19-C6DD-492C-836B-F91D3141DB2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F73DF19-C6DD-492C-836B-F91D3141DB2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F73DF19-C6DD-492C-836B-F91D3141DB2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F73DF19-C6DD-492C-836B-F91D3141DB2D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

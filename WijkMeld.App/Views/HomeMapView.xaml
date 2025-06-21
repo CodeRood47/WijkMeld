@@ -13,7 +13,7 @@
         <!--<ToolbarItem Text="Meld Incident" Command="{Binding NavigateToReportIncidentCommand}"/>-->
     </ContentPage.ToolbarItems>
 
-    <Grid RowDefinitions="Auto,*,Auto, Auto">
+    <Grid RowDefinitions="{Binding AdminGridRowDefinitions}">
         <!-- Laad-indicator bovenaan -->
         <ActivityIndicator Grid.Row="0"
                            IsRunning="{Binding IsBusy}"
@@ -22,7 +22,10 @@
                            VerticalOptions="Center"
                            Margin="10" />
 
-        <VerticalStackLayout Grid.Row="1" Spacing="10" Padding="10">
+        <VerticalStackLayout Grid.Row="1"
+                             Grid.RowSpan="{Binding IncidentCollectionViewRowSpan}"
+                             Spacing="10" 
+                             Padding="10">
             <Label Text="{Binding Title}"
                    FontSize="24"
                    FontAttributes="Bold"
@@ -50,32 +53,31 @@
                 <CollectionView.ItemTemplate>
          
                     <DataTemplate x:DataType="models:Incident">
-                        <Frame Margin="5" Padding="10" CornerRadius="10" HasShadow="True">
+                        <Border Grid.Row="2" Stroke="#ccc" StrokeThickness="1" Padding="5" Margin="10,0,10,10">
 
-                            <Frame.GestureRecognizers>
-                                <TapGestureRecognizer
+                            <Border.GestureRecognizers>
+                            <TapGestureRecognizer
                                     Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:HomeMapViewModel}}, Path=NavigateToIncidentDetailsCommand}"
                                     CommandParameter="{Binding .}"/>
-                            </Frame.GestureRecognizers>
-
-                            <StackLayout>
-                                <!-- Toont de Name van het incident (voorheen Title in mijn generieke model) -->
+                            </Border.GestureRecognizers>
+                        
+                        <StackLayout>
                                 <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="18" TextColor="OrangeRed" />
-                                <!-- Toont de Description van het incident -->
                                 <Label Text="{Binding Description}" FontSize="14" TextColor="Coral" Margin="0,5,0,0" />
                                 <Grid ColumnDefinitions="*,*">
-                                    <!-- Toont de datum (date) van het incident -->
+                                  
                                     <Label Grid.Column="0" Text="{Binding date, StringFormat='Gemeld op: {0:dd-MM-yyyy HH:mm}'}" FontSize="12" TextColor="Gray" />
-                                    <!-- Toont de Priority (Prio) van het incident -->
+                                    
                                     <Label Grid.Column="1" Text="{Binding Prio, StringFormat='Prioriteit: {0}'}" FontSize="12" TextColor="Gray" HorizontalTextAlignment="End" />
                                 </Grid>
                               
                             </StackLayout>
-                        </Frame>
+                        </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
         </VerticalStackLayout>
+        
         <Border Grid.Row="2" Stroke="#ccc" StrokeThickness="1" Padding="5" Margin="10,0,10,10"
                 IsVisible="{Binding IsUserRole}">
             <maps:Map x:Name="MyMap"
@@ -106,20 +108,23 @@
 
         </Border>
 
-        <!-- Optioneel: Een knop om incidenten handmatig te verversen -->
-        <Button Grid.Row="3"
+        <VerticalStackLayout  Grid.Row="4">
+            <Button 
                 Text="Incidenten Verversen"
                 Command="{Binding LoadIncidentsCommand}"
                 HorizontalOptions="Center"
-                Margin="0,10,0,20"
+                Margin="0,10,0,0" 
                 IsVisible="{Binding IsAdminRole}" />
 
+        
+
         <!-- "Meld Incident" knop onderaan voor GUESTs -->
-        <Button Grid.Row="3"
+        <Button 
                 Text="Meld Incident"
                 Command="{Binding NavigateToReportIncidentCommand}"
                 HorizontalOptions="Center"
                 Margin="0,10,0,20"
                 IsVisible="{Binding IsGuestRole}" />
+        </VerticalStackLayout>
     </Grid>
 </ContentPage>

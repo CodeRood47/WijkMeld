@@ -8,11 +8,13 @@ using WijkMeld.App.Services;
 using System.Diagnostics;
 
 
+
 namespace WijkMeld.App.ViewModels
 {
     public partial class LoginViewModel : BaseViewModel
     {
         private readonly AuthenticationService _authService;
+        private readonly NavigationService _navigationService;
 
         [ObservableProperty]
         private string email;
@@ -27,9 +29,10 @@ namespace WijkMeld.App.ViewModels
         public ICommand LoginCommand { get; }
 
 
-        public LoginViewModel(AuthenticationService authService)
+        public LoginViewModel(AuthenticationService authService, NavigationService navigationService)
         {
             _authService = authService;
+            _navigationService = navigationService;
             LoginCommand = new Command(async () => await LoginAsync());
         }
 
@@ -46,7 +49,7 @@ namespace WijkMeld.App.ViewModels
 
             if (success)
             {
-                await Shell.Current.GoToAsync("//home");
+                await _navigationService.GoToAsync("//home");
             }
             else
             {
@@ -68,7 +71,7 @@ namespace WijkMeld.App.ViewModels
                 if (success)
                 {
                     Debug.WriteLine("LoginViewModel: Anonieme login succesvol, navigeert naar home.");
-                    await Shell.Current.GoToAsync("//home");
+                    await _navigationService.GoToAsync("//home");
                 }
                 else
                 {
@@ -96,7 +99,7 @@ namespace WijkMeld.App.ViewModels
             IsBusy = true;
             try
             {
-                await Shell.Current.GoToAsync("//register");
+                await _navigationService.GoToAsync("//register");
                 Debug.WriteLine("LoginViewModel: Navigatie naar registratiepagina voltooid.");
             }
             catch (Exception ex)

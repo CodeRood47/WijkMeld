@@ -20,6 +20,7 @@ namespace WijkMeld.App.ViewModels
         private readonly IncidentService _incidentService;
         private readonly AuthenticationService _authenticationService;
         private readonly GeolocationService _geolocationService;
+        private readonly NavigationService _navigationService;
 
         [ObservableProperty]
         private ObservableCollection<Incident> incidents;
@@ -36,20 +37,33 @@ namespace WijkMeld.App.ViewModels
         [ObservableProperty]
         private bool isUserRole;
 
-        [ObservableProperty]
-        private bool isAdminRole;
 
         [ObservableProperty]
-        private bool isFieldAgentRole; // Toekomstig
+        private bool isFieldAgentRole; 
 
         [ObservableProperty]
         private bool isGuestRole;
 
-        public HomeMapViewModel(IncidentService incidentService, AuthenticationService authenticationService, GeolocationService geolocationService)
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(AdminGridRowDefinitions), nameof(IncidentCollectionViewRowSpan), nameof(AdminRefreshButtonRow), nameof(GuestReportButtonRow))]
+        private bool isAdminRole;
+        public string AdminGridRowDefinitions => IsAdminRole ? "Auto,*,Auto" : "Auto,*,Auto,Auto";
+
+        public int IncidentCollectionViewRowSpan => IsAdminRole ? 2 : 1; // 2 rows for admin (covering map), 1 for others
+
+        public int AdminRefreshButtonRow => IsAdminRole ? 2 : 3; // Row 2 if admin takes over map space, else Row 3
+
+        public int GuestReportButtonRow => IsAdminRole ? 3 : 3;
+        public HomeMapViewModel(IncidentService incidentService, 
+            AuthenticationService authenticationService, 
+            GeolocationService geolocationService,
+            NavigationService navigationService
+            )
         {
             _incidentService = incidentService;
             _authenticationService = authenticationService;
             _geolocationService = geolocationService;
+            _navigationService = navigationService;
             Incidents = new ObservableCollection<Incident>();
             IncidentPins = new ObservableCollection<Pin>();
             Title = "Mijn Incidenten";
@@ -79,7 +93,10 @@ namespace WijkMeld.App.ViewModels
             IsAdminRole = (userRole == UserRole.ADMIN);
             IsFieldAgentRole = (userRole == UserRole.FIELD_AGENT);
             IsGuestRole = (userRole == UserRole.GUEST);
-
+            OnPropertyChanged(nameof(AdminGridRowDefinitions));
+            OnPropertyChanged(nameof(IncidentCollectionViewRowSpan));
+            OnPropertyChanged(nameof(AdminRefreshButtonRow));
+            OnPropertyChanged(nameof(GuestReportButtonRow));
         }
 
         [RelayCommand]
@@ -205,7 +222,7 @@ namespace WijkMeld.App.ViewModels
         {
             Debug.WriteLine($"HomeMapViewModel: Navigeren naar details van incident {incident?.Id} met naam '{incident?.Name}'.");
             if (incident == null) return;
-            await Shell.Current.GoToAsync($"incidentdetails?incidentId={incident.Id}");
+            await _navigationService.GoToAsync($"incidentdetails?incidentId={incident.Id}");
         }
 
         [RelayCommand]
@@ -213,15 +230,15 @@ namespace WijkMeld.App.ViewModels
         {
             await _authenticationService.LogoutAsync();
     
-            await Shell.Current.GoToAsync("//login");
-            System.Diagnostics.Debug.WriteLine("HomeMapViewModel: Uitgelogd en navigeert naar LoginView.");
+            await _navigationService.GoToAsync("//login");
+            Debug.WriteLine("HomeMapViewModel: Uitgelogd en navigeert naar LoginView.");
         }
 
         [RelayCommand]
         public async Task NavigateToReportIncidentAsync()
         { 
-            await Shell.Current.GoToAsync("//reportincident"); 
-            System.Diagnostics.Debug.WriteLine("HomeMapViewModel: Navigeert naar ReportIncidentView.");
+            await _navigationService.GoToAsync("//reportincident"); 
+            Debug.WriteLine("HomeMapViewModel: Navigeert naar ReportIncidentView.");
         }
     }
 }

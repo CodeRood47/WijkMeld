@@ -15,6 +15,7 @@ namespace WijkMeld.App.ViewModels
     public partial class RegisterViewModel : BaseViewModel
     {
         private readonly AuthenticationService _authenticationService;
+        private readonly INavigationService _navigationService;
 
 
 
@@ -33,8 +34,9 @@ namespace WijkMeld.App.ViewModels
 
         [ObservableProperty]
         private string errorMessage = string.Empty;
-        public RegisterViewModel(AuthenticationService authenticationService)
+        public RegisterViewModel(AuthenticationService authenticationService, INavigationService navigationService)
         {
+            _navigationService = navigationService;
             _authenticationService = authenticationService;
             Title = "Registreren";
         }
@@ -69,23 +71,25 @@ namespace WijkMeld.App.ViewModels
 
                 Debug.WriteLine($"RegisterRequest aangemaakt: UserName='{registerRequest.UserName}', Email='{registerRequest.Email}', Role={registerRequest.Role}");
 
+         
 
                 var result = await _authenticationService.RegisterUserAsync(registerRequest);
 
                 if (result)
                 {
-                    await Application.Current.MainPage.DisplayAlert("Succes", "Registratie succesvol.", "OK");
                     // Navigate to login view
-                    await Shell.Current.GoToAsync("//login");
+                    await _navigationService.GoToAsync("//login");
                 }
                 else
                 {
-                    await Application.Current.MainPage.DisplayAlert("Fout", "Registratie mislukt. Probeer het opnieuw.", "OK");
+                    ErrorMessage = "Registratie mislukt. Probeer het opnieuw.";
+                    Debug.WriteLine("Registratie mislukt via API. Foutbericht ingesteld.");
                 }
             }
             catch (Exception ex)
             {
-                await Application.Current.MainPage.DisplayAlert("Fout", $"Er is een fout opgetreden: {ex.Message}", "OK");
+                ErrorMessage = $"Er is een fout opgetreden: {ex.Message}";
+                Debug.WriteLine("Fout", $"Er is een fout opgetreden: {ex.Message}", "OK");
             }
             finally
             {

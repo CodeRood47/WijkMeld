@@ -19,10 +19,10 @@ namespace WijkMeld.App.Model
         public User? user { get; set; }
 
         [JsonPropertyName("userId")]
-        public Guid UserId { get; set; }
+        public Guid? UserId { get; set; }
 
         [JsonPropertyName("userName")] 
-        public string UserName { get; set; }
+        public string? UserName { get; set; }
 
         public Location Location { get; set; }
 
