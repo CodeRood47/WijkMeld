@@ -151,9 +151,6 @@ namespace WijkMeld.App.ViewModels
                         Debug.WriteLine("HomeMapViewModel: Gebruiker is USER, laden eigen incidenten...");
                         incidentsToDisplay = await _incidentService.GetUserIncidentsAsync();
                         break;
-                    case UserRole.GUEST:
-                        incidentsToDisplay = await _incidentService.GetAllIncidentsAsync();
-                        break;
                     default:
                         Debug.WriteLine("HomeMapViewModel: Onbekende rol, geen incidenten geladen.");
                         break;

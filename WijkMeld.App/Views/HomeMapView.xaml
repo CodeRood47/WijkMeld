@@ -50,7 +50,7 @@
 
             <CollectionView ItemsSource="{Binding Incidents}"
                             SelectionMode="None">
-                <!-- BELANGRIJK: HeightRequest verwijderd zodat CollectionView alle beschikbare ruimte inneemt in rij 1 -->
+        
                 <CollectionView.EmptyView>
                     <StackLayout Padding="20" VerticalOptions="Center" HorizontalOptions="Center">
                         <Label Text="Geen incidenten gevonden."
@@ -121,12 +121,7 @@
                 Margin="0,10,0,0" 
                 IsVisible="{Binding IsAdminRole}" />
 
-            <Button 
-                Text="Meld Incident"
-                Command="{Binding NavigateToReportIncidentCommand}"
-                HorizontalOptions="Center"
-                Margin="0,10,0,20"
-                IsVisible="{Binding IsGuestRole}" />
+            
         </VerticalStackLayout>
     </Grid>
 </ContentPage>
