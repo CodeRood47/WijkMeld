@@ -119,9 +119,10 @@ namespace WijkMeld.App.ViewModels
         {
             if(!MediaPicker.Default.IsCaptureSupported)
             {
-                
-                    Debug.WriteLine("Fout", "Camera is niet beschikbaar op dit apparaat.", "OK");
-                
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    await Shell.Current.DisplayAlert("Fout", "Camera is niet beschikbaar op dit apparaat.", "OK");
+                });
                 return;
             }
 
@@ -133,7 +134,10 @@ namespace WijkMeld.App.ViewModels
                     status = await Permissions.RequestAsync<Permissions.Camera>();
                     if (status != PermissionStatus.Granted)
                     {
-                        Debug.WriteLine("Toestemming geweigerd", "Je moet cameratoegang verlenen om foto's te maken.", "OK");
+                        MainThread.BeginInvokeOnMainThread(async () =>
+                        {
+                            await Shell.Current.DisplayAlert("Toestemming geweigerd", "Je moet cameratoegang verlenen om foto's te maken.", "OK");
+                        });
                         return;
                     }
                 }

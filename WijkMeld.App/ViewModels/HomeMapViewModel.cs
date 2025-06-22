@@ -66,7 +66,7 @@ namespace WijkMeld.App.ViewModels
             _navigationService = navigationService;
             Incidents = new ObservableCollection<Incident>();
             IncidentPins = new ObservableCollection<Pin>();
-            Title = "Mijn Incidenten";
+            Title = "Incidenten";
 
 
             CurrentMapRegion = MapSpan.FromCenterAndRadius(

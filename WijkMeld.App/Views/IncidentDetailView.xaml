@@ -75,7 +75,7 @@
                         </CollectionView>
                      
                         <Label Grid.Row="7" Grid.Column="1" Text="Geen afbeeldingen beschikbaar." FontAttributes="Italic" TextColor="Gray"
-                           IsVisible="{Binding PhotoFilePaths.Count, Converter={StaticResource InverseNumberToBoolConverter}}"/>
+                           IsVisible="{Binding FullPhotoUrls.Count, Converter={StaticResource InverseNumberToBoolConverter}}"/>
 
 
 

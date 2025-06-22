@@ -4,7 +4,7 @@
              xmlns:local="clr-namespace:WijkMeld.App"
              xmlns:viewmodels="clr-namespace:WijkMeld.App.ViewModels"
              x:Class="WijkMeld.App.Views.LoginView"
-             Title="LoginView">
+            Title="">
 
     
     <VerticalStackLayout>
