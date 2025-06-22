@@ -36,8 +36,8 @@ namespace WijkMeld.API.Repositories.StatusUpdates
         public async Task<IEnumerable<StatusUpdate>> GetAllAsync()
         {
             return await _context.StatusUpdates
-                                 .Include(su => su.Incident) // Laadt het gekoppelde Incident
-                                 .Include(su => su.ChangedBy) // Laadt de gekoppelde User
+                                 .Include(su => su.Incident) 
+                                 .Include(su => su.ChangedBy) 
                                  .ToListAsync();
         }
 
@@ -55,7 +55,7 @@ namespace WijkMeld.API.Repositories.StatusUpdates
                                  .Where(su => su.IncidentId == incidentId)
                                  .Include(su => su.Incident)
                                  .Include(su => su.ChangedBy)
-                                 .OrderByDescending(su => su.Date) // Sorteer op datum voor de meest recente eerst
+                                 .OrderByDescending(su => su.Date) 
                                  .ToListAsync();
         }
 

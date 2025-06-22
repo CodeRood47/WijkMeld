@@ -28,9 +28,8 @@ namespace WijkMeld.API.Controllers.Dto
     {
         [Required]
         public Status NewStatus { get; set; }
-        [Required]
         public string Note { get; set; }
-        public Priority? NewPriority { get; set; } // Optioneel
+        public Priority? NewPriority { get; set; }
     }
     public class IncidentResponseDto
     {

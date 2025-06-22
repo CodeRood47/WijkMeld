@@ -11,34 +11,32 @@ namespace WijkMeld.App.Model
     public class Incident
     {
         public Guid Id { get; set; }
+        public string Name { get; set; } = string.Empty; 
+        public string Description { get; set; } = string.Empty; 
 
-        public string Name { get; set; }
-
-        public string Description { get; set; }
-
-        public User? user { get; set; }
-
-        [JsonPropertyName("userId")]
-        public Guid? UserId { get; set; }
+        [JsonPropertyName("userId")] 
+        public string? UserId { get; set; } 
 
         [JsonPropertyName("userName")] 
-        public string? UserName { get; set; }
+        public string? UserName { get; set; } = string.Empty; 
 
-        public Location Location { get; set; }
+        [JsonPropertyName("location")]
+        public Location? Location { get; set; } = new(); 
 
+        [JsonPropertyName("priority")]
+        public Priority Priority { get; set; } 
 
-        public Priority Prio { get; set; }
+        [JsonPropertyName("status")]
+        public Status Status { get; set; }  
 
-        [JsonPropertyName("created")] 
-        public DateTime date { get; set; } 
+        [JsonPropertyName("created")]
+        public DateTime Created { get; set; }
 
-        [JsonPropertyName("status")] 
-        public Status Status { get; set; }
+       
+        [JsonPropertyName("statusUpdates")] 
+        public List<IncidentStatusUpdate>? StatusUpdates { get; set; } = new(); 
 
-        [JsonPropertyName("history")]
-        public List<StatusUpdate>? History { get; set; }
-
-        [JsonPropertyName("photoFilePaths")]
+        [JsonPropertyName("photoFilePaths")] 
         public List<string>? PhotoFilePaths { get; set; } = new();
     }
 }

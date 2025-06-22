@@ -47,7 +47,7 @@ namespace WijkMeld.API.Services
             {
                 Id = Guid.NewGuid(), // Genereer een nieuwe ID voor de StatusUpdate
                 IncidentId = incidentId,
-                NewStatus = newStatus,
+                //NewStatus = newStatus,
                 ChangedBy = changedByUser, // Wijs de User entity toe
                 Date = DateTime.UtcNow, // Gebruik UTC voor consistentie
                 Note = note,

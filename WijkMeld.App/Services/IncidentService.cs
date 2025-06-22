@@ -11,6 +11,8 @@ using WijkMeld.App.Model;
 using WijkMeld.App.Model.Enums;
 using System.Net;
 using System.Diagnostics;
+using System.Text.Json;
+using Microsoft.Maui.Storage;
 
 namespace WijkMeld.App.Services
 {
@@ -330,6 +332,65 @@ namespace WijkMeld.App.Services
             {
                
                 photo.PhotoStream?.Dispose();
+            }
+        }
+        public async Task<bool> UpdateIncidentStatusAndPriorityAsync(Guid incidentId, Status? newStatus, Priority? newPriority, string? note)
+        {
+            if (!_authenticationService.IsUserLoggedIn())
+            {
+                Debug.WriteLine("IncidentService: Gebruiker is niet ingelogd, kan incidentstatus niet bijwerken.");
+                return false;
+            }
+
+            var token = await _authenticationService.GetTokenAsync();
+            if (string.IsNullOrEmpty(token))
+            {
+                Debug.WriteLine("IncidentService: JWT token niet gevonden, kan incidentstatus niet bijwerken.");
+                return false;
+            }
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            try
+            {
+                var requestBody = new UpdateIncidentRequest// Let op: Deze DTO moet overeenkomen met de API's DTO
+                {
+                    NewStatus = newStatus,
+                    Note = note,
+                    NewPriority = newPriority
+
+                };
+
+                Debug.WriteLine($"IncidentService: Verzenden PUT verzoek naar api/Incidents/{incidentId}/status met payload: {JsonSerializer.Serialize(requestBody)}");
+
+                var response = await _httpClient.PutAsJsonAsync($"api/Incidents/{incidentId}/status", requestBody);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    string errorContent = await response.Content.ReadAsStringAsync();
+                    Debug.WriteLine($"IncidentService: Fout bij bijwerken status/prioriteit (HTTP {response.StatusCode}): {errorContent}");
+                    if (response.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        await _authenticationService.LogoutAsync();
+                    }
+                    return false;
+                }
+
+                Debug.WriteLine($"IncidentService: Status/prioriteit van incident {incidentId} succesvol bijgewerkt.");
+                return true;
+            }
+            catch (HttpRequestException ex)
+            {
+                Debug.WriteLine($"IncidentService: HttpRequestException bij bijwerken status/prioriteit voor incident {incidentId}: {ex.Message}");
+                if (ex.StatusCode == HttpStatusCode.Unauthorized)
+                {
+                    await _authenticationService.LogoutAsync();
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"IncidentService: Onverwachte fout bij bijwerken status/prioriteit voor incident {incidentId}: {ex.Message}");
+                return false;
             }
         }
     }

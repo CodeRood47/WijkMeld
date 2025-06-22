@@ -14,9 +14,9 @@ namespace WijkMeld.API.Services
 
         public JwtService(IConfiguration configuration)
         {
-            _key = configuration["Jwt:Key"];
-            _issuer = configuration["Jwt:Issuer"];
-            _audience = configuration["Jwt:Audience"];
+            _key = configuration["Jwt:Key"] ?? throw new ArgumentNullException("Jwt:Key not found in configuration.");
+            _issuer = configuration["Jwt:Issuer"] ?? throw new ArgumentNullException("Jwt:Issuer not found in configuration.");
+            _audience = configuration["Jwt:Audience"] ?? throw new ArgumentNullException("Jwt:Audience not found in configuration.");
 
         }
 
